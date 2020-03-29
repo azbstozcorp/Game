@@ -12,6 +12,6 @@ namespace CoreModule.Drawables {
         public Point Position => Bounds.TopLeft;
 
         public virtual void Update(float fElapsedTime) { }
-        public virtual void Draw(CoreGame instance) { }
+        public virtual void Draw() { }
     }
 }

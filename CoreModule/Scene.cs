@@ -12,9 +12,9 @@ namespace CoreModule {
             foreach (Drawable d in Drawables) d.Update(fElapsedTime);
         }
 
-        public virtual void Draw(CoreGame instance) {
-            instance.Clear(PixelEngine.Pixel.Empty);
-            foreach (Drawable d in Drawables) d.Draw(instance);
+        public virtual void Draw() {
+            CoreGame.Instance.Clear(PixelEngine.Pixel.Empty);
+            foreach (Drawable d in Drawables) d.Draw();
         }
     }
 }

@@ -14,15 +14,24 @@ namespace CoreModule {
 
         public MainMenu() {
             Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 40));
-            Drawables.Add(new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2));
+
+            Button playButton = new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2);
+            playButton.ButtonPressed += PlayButton_ButtonPressed;
+            Drawables.Add(playButton);
+            Drawables.Add(new Button("Settings", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 10));
+            Drawables.Add(new Button("Quit", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 20));
+        }
+
+        private void PlayButton_ButtonPressed() {
+            Console.WriteLine("GO!");
         }
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
         }
-        public override void Draw(CoreGame instance) {
-            base.Draw(instance);
-            instance.Draw(instance.MouseX, instance.MouseY, instance.Random(Pixel.PresetPixels));
+        public override void Draw() {
+            base.Draw();
+            CoreGame.Instance.Draw(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY, CoreGame.Instance.Random(Pixel.PresetPixels));
         }
 
         class Banner : Drawable {
@@ -31,11 +40,11 @@ namespace CoreModule {
                                   banner.Width, banner.Height);
             }
 
-            public override void Draw(CoreGame instance) {
-                base.Draw(instance);
-                Point drawPosition = Collision.WithinRect(Bounds, (instance.MouseX, instance.MouseY))
+            public override void Draw() {
+                base.Draw();
+                Point drawPosition = Collision.WithinRect(Bounds, (CoreGame.Instance.MouseX, CoreGame.Instance.MouseY))
                     ? new Point(Position.X + RNG.Next(-1, 2), Position.Y + RNG.Next(-1, 2)) : Position;
-                instance.DrawSprite(drawPosition, banner);
+                CoreGame.Instance.DrawSprite(drawPosition, banner);
             }
         }
     }

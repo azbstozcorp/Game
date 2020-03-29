@@ -39,6 +39,7 @@ namespace CoreModule {
 
         public override void OnUpdate(float elapsed) {
             base.OnUpdate(elapsed);
+            
             SceneUpdate(elapsed);
         }
 
@@ -52,7 +53,7 @@ namespace CoreModule {
                 return;
             }
             scenes.Peek().Update(fElapsedTime);
-            scenes.Peek().Draw(this);
+            scenes.Peek().Draw();
         }
     }
 }

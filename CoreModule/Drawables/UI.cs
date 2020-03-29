@@ -6,22 +6,30 @@ using System.Threading.Tasks;
 
 namespace CoreModule.Drawables {
     public class Button : Drawable {
+        public delegate void ButtonPressedEventHandler();
+        public event ButtonPressedEventHandler ButtonPressed;
+
         public string Text { get; set; }
 
         public Button(string text, int centerX, int centerY) {
             Text = text;
 
-            // TODO: Once spritefont is implemented, find width and properly center.
-            Bounds = new Rect(new Point(centerX - 10, centerY - 5), 20, 10);
+            Bounds = new Rect(new Point(centerX - text.Length * 8 / 2, centerY - 8 / 2), text.Length * 8, 8);
         }
 
-        public override void Draw(CoreGame instance) {
-            base.Draw(instance);
+        public override void Update(float fElapsedTime) {
+            base.Update(fElapsedTime);
 
-            // TODO: Once spritefont is implemented, draw with spritefont.
-            instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);
-            if (Collision.WithinRect(Bounds, new Point(instance.MouseX, instance.MouseY), true))
-                instance.DrawRect(Bounds.TopLeft - 1, Bounds.BottomRight + 1, instance.Random(PixelEngine.Pixel.PresetPixels));
+            if (Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true))
+                if (CoreGame.Instance.GetMouse(PixelEngine.Mouse.Any).Down) ButtonPressed?.Invoke();
+        }
+
+        public override void Draw() {
+            base.Draw();
+
+            CoreGame.Instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);
+            if (Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true))
+                CoreGame.Instance.DrawRect(Bounds.TopLeft - 1, Bounds.BottomRight + 1, CoreGame.Instance.Random(PixelEngine.Pixel.PresetPixels));
         }
     }
 }
