@@ -49,7 +49,8 @@ namespace CoreModule {
         Point a, b;
 
         public Line() {
-            a = b = new Point();
+            a = new Point();
+            b = new Point();
         }
         public Line(Point a, Point b) : this() { Start = a; End = b; }
 
@@ -102,7 +103,12 @@ namespace CoreModule {
 
         public Point topLeft, topRight, bottomLeft, bottomRight;
 
-        public Rect() => topLeft = topRight = bottomLeft = bottomRight = new Point();
+        public Rect() {
+            topLeft = new Point();
+            topRight = new Point();
+            bottomLeft = new Point();
+            bottomRight = new Point();
+        }
         public Rect(Point topLeft, Point bottomRight) : this() {
             TopLeft = topLeft;
             BottomRight = bottomRight;
