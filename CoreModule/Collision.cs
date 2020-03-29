@@ -5,7 +5,7 @@ namespace CoreModule {
         /// Check a given value between two bounds
         /// </summary>
         public static bool Between(int lowerBound, int upperBound, int value, bool inclusive = false) =>
-             (lowerBound < value && upperBound < value) ||                  /* Check the value between upper and lower bounds    */
+             (lowerBound < value && upperBound > value) ||                  /* Check the value between upper and lower bounds    */
              (inclusive && (value == lowerBound || value == upperBound));   /* If the check is inclusive, return true for bounds */
 
         /// <summary>
@@ -14,6 +14,8 @@ namespace CoreModule {
         public static bool WithinRect(Point topLeft, Point bottomRight, Point check, bool inclusive = false) =>
             Between(topLeft.X, bottomRight.X, check.X, inclusive) &&   /* Check X coordinate */
             Between(topLeft.Y, bottomRight.Y, check.Y, inclusive);     /* Check Y coordinate */
+        public static bool WithinRect(Rect bounds, Point check, bool inclusive = false) =>
+            WithinRect(bounds.TopLeft, bounds.BottomRight, check, inclusive);
 
         /// <summary>
         /// Check if two rectangles overlap

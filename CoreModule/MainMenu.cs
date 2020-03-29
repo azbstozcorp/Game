@@ -5,32 +5,38 @@ using System.Text;
 using System.Threading.Tasks;
 
 using PixelEngine;
+using CoreModule.Drawables;
 
 namespace CoreModule {
     public class MainMenu : Scene {
-        Random RNG = new Random();
+        static Random RNG = new Random();
+        static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
 
-        Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
-        Sprite playButton = Sprite.Load("Assets/Scenes/MainMenu/playbutton.png");
+        public MainMenu() {
+            Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 40));
+            Drawables.Add(new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2));
+        }
 
-        public override void Update(float fElapsedTime, CoreGame instance) {
-            base.Update(fElapsedTime, instance);
-            instance.Clear(Pixel.Empty);
-
-            int bannerX = (instance.ScreenWidth) / 2 - banner.Width / 2 + RNG.Next(-1, 1);
-            int bannerY = (instance.ScreenHeight) / 2 - banner.Height - 20 + RNG.Next(-1, 1);
-            instance.DrawSprite(new Point(bannerX, bannerY), banner);
-
-            int playButtonX = (instance.ScreenWidth) / 2 - playButton.Width / 2;
-            int playButtonY = (instance.ScreenHeight) / 2 - playButton.Height / 2;
-            instance.DrawSprite(new Point(playButtonX, playButtonY), playButton);
-
-            if (instance.MouseX > playButtonX && instance.MouseX < playButtonX + playButton.Width && instance.MouseY > playButtonY && instance.MouseY < playButtonY + playButton.Height)
-                instance.DrawRect(new Point(playButtonX - 1, playButtonY - 1),
-                    new Point(playButtonX + playButton.Width + 1, playButtonY + playButton.Height + 1),
-                    instance.Random(Pixel.PresetPixels));
-
+        public override void Update(float fElapsedTime) {
+            base.Update(fElapsedTime);
+        }
+        public override void Draw(CoreGame instance) {
+            base.Draw(instance);
             instance.Draw(instance.MouseX, instance.MouseY, instance.Random(Pixel.PresetPixels));
+        }
+
+        class Banner : Drawable {
+            public Banner(int centerX, int centerY) {
+                Bounds = new Rect(new Point(centerX - banner.Width / 2, centerY - banner.Height / 2),
+                                  banner.Width, banner.Height);
+            }
+
+            public override void Draw(CoreGame instance) {
+                base.Draw(instance);
+                Point drawPosition = Collision.WithinRect(Bounds, (instance.MouseX, instance.MouseY))
+                    ? new Point(Position.X + RNG.Next(-1, 2), Position.Y + RNG.Next(-1, 2)) : Position;
+                instance.DrawSprite(drawPosition, banner);
+            }
         }
     }
 }

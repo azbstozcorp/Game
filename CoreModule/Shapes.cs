@@ -21,6 +21,9 @@ namespace CoreModule {
         public static implicit operator PixelEngine.Point(Point p) => new PixelEngine.Point(p.X, p.Y);
         public static implicit operator (int x, int y) (Point p) => (p.X, p.Y);
 
+        public static Point operator +(Point a, int b) => new Point(a.X + b, a.Y + b);
+        public static Point operator -(Point a, int b) => a + -b;
+
         public override string ToString() => $"({X},{Y})";
 
         public override bool Equals(object obj) {
@@ -63,63 +66,25 @@ namespace CoreModule {
     /// </summary>
     [System.Serializable]
     public class Rect {
-        public Point TopLeft {
-            get => topLeft; set {
-                topLeft = value;
-                topRight.Y = value.Y;
-                bottomRight.X = value.X;
-                MaintainStructure();
-            }
-        }
-        public Point TopRight {
-            get => topRight; set {
-                topRight = value;
-                topLeft.Y = value.Y;
-                bottomRight.X = value.X;
-                MaintainStructure();
-            }
-        }
-        public Point BottomLeft {
-            get => bottomLeft; set {
-                bottomLeft = value;
-                bottomRight.Y = value.Y;
-                topLeft.X = value.X;
-                MaintainStructure();
-            }
-        }
-        public Point BottomRight {
-            get => bottomRight; set {
-                bottomRight = value;
-                bottomLeft.Y = value.Y;
-                topRight.X = value.X;
-                MaintainStructure();
-            }
-        }
+        public Point TopLeft => new Point(Left, Top);
+        public Point TopRight => new Point(Right, Top);
+        public Point BottomLeft => new Point(Left, Bottom);
+        public Point BottomRight => new Point(Right, Bottom);
 
-        public int Top => TopLeft.Y;
-        public int Left => TopLeft.X;
-        public int Bottom => BottomRight.Y;
-        public int Right => BottomRight.X;
+        public int Top { get; set; }
+        public int Left { get; set; }
+        public int Bottom { get; set; }
+        public int Right { get; set; }
 
-        public Point topLeft, topRight, bottomLeft, bottomRight;
-
-        public Rect() {
-            topLeft = new Point();
-            topRight = new Point();
-            bottomLeft = new Point();
-            bottomRight = new Point();
-        }
+        public Rect() { }
         public Rect(Point topLeft, Point bottomRight) : this() {
-            TopLeft = topLeft;
-            BottomRight = bottomRight;
+            Top = topLeft.Y;
+            Left = topLeft.X;
+            Bottom = bottomRight.Y;
+            Right = bottomRight.X;
         }
         public Rect(Point topLeft, int width, int height) : this(topLeft, (topLeft.X + width, topLeft.Y + height)) { }
         public Rect(int x1, int y1, int x2, int y2) : this((x1, y1), (x2, y2)) { }
-
-        void MaintainStructure() {
-            if (TopLeft.X > TopRight.X) (TopLeft, TopRight) = (TopRight, TopLeft);
-            if (BottomRight.Y < TopRight.Y) (BottomRight, TopRight) = (TopRight, BottomRight);
-        }
 
         public static bool operator ==(Rect a, Rect b) =>
             a.TopLeft == b.TopLeft &&

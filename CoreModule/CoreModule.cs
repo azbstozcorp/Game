@@ -51,7 +51,8 @@ namespace CoreModule {
                 Console.WriteLine("Scene stack empty.");
                 return;
             }
-            scenes.Peek().Update(fElapsedTime, Instance);
+            scenes.Peek().Update(fElapsedTime);
+            scenes.Peek().Draw(this);
         }
     }
 }
