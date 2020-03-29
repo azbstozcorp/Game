@@ -31,6 +31,9 @@ namespace CoreModule {
         }
     }
 
+    /// <summary>
+    /// Line in 2d space
+    /// </summary>
     [System.Serializable]
     public class Line {
         public Point Start {
