@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿// Shapes.cs
 namespace CoreModule {
     /// <summary>
     /// Point in 2d space
     /// </summary>
-    [Serializable]
+    [System.Serializable]
     public class Point {
         public int X { get; set; }
         public int Y { get; set; }
@@ -36,7 +31,7 @@ namespace CoreModule {
         }
     }
 
-    [Serializable]
+    [System.Serializable]
     public class Line {
         public Point Start {
             get => a; set {
@@ -62,7 +57,7 @@ namespace CoreModule {
     /// <summary>
     /// Rectangle in 2d space
     /// </summary>
-    [Serializable]
+    [System.Serializable]
     public class Rect {
         public Point TopLeft {
             get => topLeft; set {

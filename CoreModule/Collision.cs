@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿// Collision.cs
 namespace CoreModule {
     public static class Collision {
         /// <summary>
