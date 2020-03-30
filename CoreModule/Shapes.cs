@@ -26,6 +26,12 @@ namespace CoreModule {
 
         public override string ToString() => $"({X},{Y})";
 
+        public override int GetHashCode() {
+            int hash = 17;
+            hash *= 23 + X.GetHashCode();
+            hash *= 23 + Y.GetHashCode();
+            return hash;
+        }
         public override bool Equals(object obj) {
             Point other = obj as Point;
             if (other != null)   /* If the object is a point, check for equality ---------- */
@@ -59,6 +65,17 @@ namespace CoreModule {
 
         public static bool operator ==(Line a, Line b) => a.Start == b.Start && a.End == b.End;
         public static bool operator !=(Line a, Line b) => !(a == b);
+
+        public override int GetHashCode() {
+            int hash = 17;
+            hash *= 23 + a.GetHashCode();
+            hash *= 23 + b.GetHashCode();
+            return hash;
+        }
+        public override bool Equals(object obj) {
+            if (obj is Line line) return this == line;
+            return false;
+        }
     }
 
     /// <summary>
@@ -94,5 +111,18 @@ namespace CoreModule {
         public static bool operator !=(Rect a, Rect b) => !(a == b);
 
         public override string ToString() => $"[{TopLeft},{TopRight},{BottomLeft},{BottomRight}]";
+
+        public override bool Equals(object obj) {
+            if (obj is Rect rect) return this == rect;
+            return false;
+        }
+        public override int GetHashCode() {
+            int hash = 17;
+            hash *= 23 + Top.GetHashCode();
+            hash *= 23 + Left.GetHashCode();
+            hash *= 23 + Bottom.GetHashCode();
+            hash *= 23 + Right.GetHashCode();
+            return hash;
+        }
     }
 }
