@@ -14,6 +14,7 @@ namespace CoreModule {
 
         public Point CameraLocation;
         Chunk[,] chunks;
+        int tileIndex = 2;
 
         public World() {
             Console.WriteLine("Initializing World...");
@@ -27,7 +28,7 @@ namespace CoreModule {
                     chunks[i, j] = new Chunk((i * Chunk.ChunkSize, j * Chunk.ChunkSize));
                 }
 
-            chunks[0, 0].AddTile(new Tile(TerrainType.TT_DIRT), 2, 4);
+            //chunks[0, 0].SetTile(new Tile(TerrainType.TT_DIRT), 2, 4);
         }
 
         public override void Update(float fElapsedTime) {
@@ -39,8 +40,11 @@ namespace CoreModule {
             int tileMouseX = ((CoreGame.Instance.MouseX - CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
             int tileMouseY = ((CoreGame.Instance.MouseY - CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
 
+            tileIndex += (int)CoreGame.Instance.MouseScroll;
+            if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
+            if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
             if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
-                chunks[chunkMouseX, chunkMouseY].AddTile(new Tile(TerrainType.TT_DIRT), tileMouseX, tileMouseY);
+                chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
             }
 
             if (CoreGame.Instance.GetKey(Key.Left).Down) CameraLocation.X++;
@@ -55,6 +59,7 @@ namespace CoreModule {
             for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
                     chunks[i, j].Draw();
                 }
+            CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
         }
     }
 }

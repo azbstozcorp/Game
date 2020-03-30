@@ -10,6 +10,7 @@ namespace CoreModule.Terrain {
 
         TT_AIR,
         TT_DIRT,
+        TT_GRASS,
 
         TT_COUNT // Always keep last
     }
