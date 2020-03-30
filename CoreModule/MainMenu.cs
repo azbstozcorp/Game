@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using PixelEngine;
 using CoreModule.Drawables;
+using CoreModule.Shapes;
+
+using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule {
     public class MainMenu : Scene {

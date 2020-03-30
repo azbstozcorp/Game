@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 using PixelEngine;
 using CoreModule.Drawables;
+using CoreModule.Shapes;
 using CoreModule.Terrain;
+
+using PPoint = PixelEngine.Point;
+using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule {
     public class World : Scene {

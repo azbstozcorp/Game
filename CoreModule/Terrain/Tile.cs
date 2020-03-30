@@ -5,7 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using PixelEngine;
+using CoreModule.Shapes;
 using static CoreModule.Terrain.TerrainType;
+
+using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Terrain {
     public static class TileManager {

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using CoreModule.Shapes;
+
 namespace CoreModule.Drawables {
     public abstract class Drawable {
         public static bool MouseOver { get; private set; }

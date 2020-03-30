@@ -1,4 +1,5 @@
 ﻿// Collision.cs
+using CoreModule.Shapes;
 namespace CoreModule {
     public static class Collision {
         /// <summary>

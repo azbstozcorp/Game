@@ -51,10 +51,12 @@
     <Compile Include="CoreModule.cs" />
     <Compile Include="Drawables\Drawable.cs" />
     <Compile Include="Drawables\UI.cs" />
+    <Compile Include="Shapes\Line.cs" />
     <Compile Include="MainMenu.cs" />
+    <Compile Include="Shapes\Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shapes\Rect.cs" />
     <Compile Include="Scene.cs" />
-    <Compile Include="Shapes.cs" />
     <Compile Include="Terrain\TerrainTypes.cs" />
     <Compile Include="Terrain\Tile.cs" />
     <Compile Include="World.cs" />
