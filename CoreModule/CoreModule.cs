@@ -26,7 +26,7 @@ namespace CoreModule {
             Console.WriteLine("Constructing core game");
             Instance = this;
 
-            Construct(200, 112, 8, 8, 60);
+            Construct(200, 120, 8, 8, 60);
 
             Enable(Subsystem.Audio);
             PixelMode = Pixel.Mode.Alpha;
@@ -39,13 +39,15 @@ namespace CoreModule {
 
         public override void OnUpdate(float elapsed) {
             base.OnUpdate(elapsed);
-            
             SceneUpdate(elapsed);
         }
 
         public override void OnDestroy() {
             base.OnDestroy();
         }
+
+        public void PushScene(Scene scene) => scenes.Push(scene);
+        public void PopScene() => scenes.Pop();
 
         void SceneUpdate(float fElapsedTime) {
             if (scenes.Count <= 0) {

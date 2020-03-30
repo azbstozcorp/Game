@@ -13,7 +13,7 @@ namespace CoreModule {
         static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
 
         public MainMenu() {
-            Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 40));
+            Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 30));
 
             Button playButton = new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2);
             playButton.ButtonPressed += PlayButton_ButtonPressed;
@@ -23,7 +23,7 @@ namespace CoreModule {
         }
 
         private void PlayButton_ButtonPressed() {
-            Console.WriteLine("GO!");
+            CoreGame.Instance.PushScene(new World());
         }
 
         public override void Update(float fElapsedTime) {
