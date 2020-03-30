@@ -142,6 +142,27 @@ namespace CoreModule.Terrain {
                             ));
                     }
             }
+
+            TrimColliders();
+        }
+
+        void TrimColliders() {
+            for (int i = Colliders.Count - 1; i >= 0; i--) {
+                for (int j = Colliders.Count - 1; j >= 0; j--) {
+                    if (i == j) continue;
+                    Rect a = Colliders[i];
+                    Rect b = Colliders[j];
+
+                    if (a.Right == b.Left && a.Top == b.Top && a.Bottom == b.Bottom) {
+                        a.Right = b.Right;
+                        Colliders.Remove(b);
+                    }
+                    if (a.Bottom == b.Top && a.Right == b.Right && a.Left == b.Left) {
+                        a.Bottom = b.Bottom;
+                        Colliders.Remove(b);
+                    }
+                }
+            }
         }
     }
 }

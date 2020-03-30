@@ -106,16 +106,13 @@ namespace CoreModule {
         public Rect(int x1, int y1, int x2, int y2) : this((x1, y1), (x2, y2)) { }
 
         public static bool operator ==(Rect a, Rect b) =>
-            a.TopLeft == b.TopLeft &&
-            a.TopRight == b.TopRight &&
-            a.BottomLeft == b.BottomLeft &&
-            a.BottomRight == b.BottomRight;
+            a.Equals(b);
         public static bool operator !=(Rect a, Rect b) => !(a == b);
 
         public override string ToString() => $"[{TopLeft},{TopRight},{BottomLeft},{BottomRight}]";
 
         public override bool Equals(object obj) {
-            if (obj is Rect rect) return this == rect;
+            if (obj is Rect rect) return this.GetHashCode() == rect.GetHashCode();
             return false;
         }
         public override int GetHashCode() {
