@@ -31,8 +31,6 @@ namespace CoreModule.Drawables.Entities {
         new RectF Bounds;
         RectF oldBounds;
 
-        bool onGround = false;
-
         public PhysicsEntity(int x, int y, int width, int height, PixelEngine.Sprite sprite) {
             Bounds = new Rect(new Point(x, y), width, height);
             oldBounds = Bounds.Copy;
@@ -80,7 +78,7 @@ namespace CoreModule.Drawables.Entities {
             foreach (Rect collider in collidingRects) {
                 PointF change = Bounds.Center - oldBounds.Center;
 
-                float margin = 2f;
+                float margin = 4f;
 
                 Rect left = new Rect(new PointF(Bounds.Left - 1, Bounds.Top + margin), new PointF(Bounds.Left, Bounds.Bottom - margin));
                 Rect right = new Rect(new PointF(Bounds.Right, Bounds.Top + margin), new PointF(Bounds.Right + 1, Bounds.Bottom - margin));
