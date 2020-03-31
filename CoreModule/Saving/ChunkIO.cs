@@ -7,18 +7,13 @@ using CoreModule.Terrain;
 
 using Chunk = CoreModule.Terrain.Chunk;
 
-namespace CoreModule.Saving
-{
-    public static class ChunkIO
-    {
-        public void SaveChunk(Chunk chunk, string path, int xCoord, int yCoord)
-        {
-            if (path[path.Length] == '\\')
-            {
+namespace CoreModule.Saving {
+    public static class ChunkIO {
+        public static void SaveChunk(Chunk chunk, string path, int xCoord, int yCoord) {
+            if (path[path.Length] == '\\') {
                 path += $"chunk{xCoord}_{yCoord}.bin";
             }
-            else
-            {
+            else {
                 path += $"\\chunk{xCoord}_{yCoord}.bin";
             }
 
@@ -30,14 +25,11 @@ namespace CoreModule.Saving
             stream.Close();
         }
 
-        public Chunk LoadChunk(string path, int xCoord, int yCoord)
-        {
-            if (path[path.Length] == '\\')
-            {
+        public static Chunk LoadChunk(string path, int xCoord, int yCoord) {
+            if (path[path.Length] == '\\') {
                 path += $"chunk{xCoord}_{yCoord}.bin";
             }
-            else
-            {
+            else {
                 path += $"\\chunk{xCoord}_{yCoord}.bin";
             }
 
@@ -45,7 +37,7 @@ namespace CoreModule.Saving
             BinaryFormatter formatter = new BinaryFormatter();
 
             Chunk returnChunk = (Chunk)formatter.Deserialize(stream);
-            stream.Close();      
+            stream.Close();
         }
     }
 }
