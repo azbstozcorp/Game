@@ -16,6 +16,7 @@ namespace CoreModule.Terrain {
         public const int NumTiles = 20;
         public const int ChunkSize = Tile.TileSize * NumTiles;
 
+        public Point WorldPosition { get; } = new Point();
         public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
@@ -37,7 +38,7 @@ namespace CoreModule.Terrain {
             base.Draw();
             Point topLeft = new Point(World.Instance.CameraLocation.X + Bounds.Left, World.Instance.CameraLocation.Y + Bounds.Top);
             Point bottomRight = new Point(World.Instance.CameraLocation.X + Bounds.Right, World.Instance.CameraLocation.Y + Bounds.Bottom);
-            CoreGame.Instance.DrawRect(topLeft, bottomRight, CoreGame.Instance.Random(Pixel.PresetPixels));
+            CoreGame.Instance.DrawRect(topLeft, bottomRight, Pixel.Presets.White);
 
             if (Empty)
                 return; // If there are no tiles in the chunk, don't draw

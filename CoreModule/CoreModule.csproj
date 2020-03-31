@@ -52,6 +52,7 @@
     <Compile Include="Collision.cs" />
     <Compile Include="CoreModule.cs" />
     <Compile Include="Drawables\Drawable.cs" />
+    <Compile Include="Drawables\Entities\PhysicsEntity.cs" />
     <Compile Include="Drawables\UI.cs" />
     <Compile Include="Shapes\Line.cs" />
     <Compile Include="MainMenu.cs" />
