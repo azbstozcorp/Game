@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="*.cs"/>
+    <Compile Include="*\*.cs"/>
     <Compile Include="Collision.cs" />
     <Compile Include="CoreModule.cs" />
     <Compile Include="Drawables\Drawable.cs" />

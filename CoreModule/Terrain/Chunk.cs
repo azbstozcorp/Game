@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 using PixelEngine;
 using CoreModule.Shapes;
@@ -6,7 +8,10 @@ using static CoreModule.Terrain.TerrainType;
 
 using Point = CoreModule.Shapes.Point;
 
+
 namespace CoreModule.Terrain {
+
+    [Serializable()]
     public class Chunk : Drawables.Drawable {
         public const int NumTiles = 20;
         public const int ChunkSize = Tile.TileSize * NumTiles;
