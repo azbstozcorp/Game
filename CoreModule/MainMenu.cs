@@ -13,7 +13,7 @@ using Point = CoreModule.Shapes.Point;
 namespace CoreModule {
     public class MainMenu : Scene {
         static Random RNG = new Random();
-        static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
+        [NonSerialized] static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
 
         public MainMenu() {
             Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 30));
@@ -26,7 +26,7 @@ namespace CoreModule {
         }
 
         private void PlayButton_ButtonPressed() {
-            CoreGame.Instance.PushScene(new Level());
+            CoreGame.Instance.PushScene(Level.LoadLevel("TestingRoom"));
         }
 
         public override void Update(float fElapsedTime) {

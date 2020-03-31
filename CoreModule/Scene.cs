@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using CoreModule.Drawables;
 
 namespace CoreModule {
+    [Serializable]
     public class Scene {
         public List<Drawable> Drawables { get; set; } = new List<Drawable>();
 

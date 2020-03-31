@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 using PixelEngine;
 using CoreModule.Shapes;
@@ -11,8 +10,7 @@ using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Terrain {
 
-    [Serializable()]
-    public class Chunk : Drawables.Drawable {
+    public class Chunk : Drawables.Drawable, Saving.ISerializable<Chunk> {
         public const int NumTiles = 20;
         public const int ChunkSize = Tile.TileSize * NumTiles;
 
@@ -25,8 +23,14 @@ namespace CoreModule.Terrain {
 
         public Chunk() {
             Bounds = new Rect();
+
+            for (int x = 0; x < NumTiles; x++) {
+                for (int y = 0; y < NumTiles; y++) {
+                    Tiles[x, y] = new Tile((TT_AIR));
+                }
+            }
         }
-        public Chunk(Point location) {
+        public Chunk(Point location) : this() {
             Bounds = new Rect(location, ChunkSize, ChunkSize);
         }
 
@@ -56,7 +60,7 @@ namespace CoreModule.Terrain {
 
                     CoreGame.Instance.DrawSprite(new Point(x * Tile.TileSize + topLeft.X,
                                                            y * Tile.TileSize + topLeft.Y),
-                                                 current.sprite);
+                                                 current.Sprite);
                 }
 
             foreach (Rect collider in Colliders) {
@@ -122,16 +126,38 @@ namespace CoreModule.Terrain {
                         Colliders.Remove(b);
                     }
 
-                    if(a.Right == b.Left && a.Bottom == b.Bottom && a.Top != b.Top && b.Top < a.Top) {
+                    if (a.Right == b.Left && a.Bottom == b.Bottom && a.Top != b.Top && b.Top < a.Top) {
                         a.Right = b.Right;
                         b.Bottom = a.Top;
                     }
-                    if(a.Right == b.Left && a.Top == b.Top && a.Bottom != b.Bottom && b.Top > a.Top) {
+                    if (a.Right == b.Left && a.Top == b.Top && a.Bottom != b.Bottom && b.Top > a.Top) {
                         a.Right = b.Right;
                         b.Top = a.Bottom;
                     }
                 }
             }
+        }
+
+        public byte[] GetSaveData() {
+            byte[] tileData = new byte[NumTiles * NumTiles];
+            for (int x = 0; x < NumTiles; x++) {
+                for (int y = 0; y < NumTiles; y++) {
+                    tileData[x * y] = (byte)Tiles[x, y].Type;
+                }
+            }
+            return tileData;
+        }
+
+        public void LoadSaveData(byte[] data) {
+            for (int x = 0; x < NumTiles; x++) {
+                for (int y = 0; y < NumTiles; y++) {
+                    TerrainType type = (TerrainType)data[x * y];
+                    Tiles[x, y].Type = type;
+                    if (Tiles[x, y].Type != TT_AIR || type != TT_UNDEFINED) Empty = false;
+                }
+            }
+
+            GenerateColliders();
         }
     }
 }

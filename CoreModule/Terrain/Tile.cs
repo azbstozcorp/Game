@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 using PixelEngine;
 
 namespace CoreModule.Terrain {
-
     public class Tile : Drawables.Drawable {
         public const int TileSize = 4;
 
-        public TerrainType Type { get; private set; }
-        public Sprite sprite;
+        public TerrainType Type {
+            get => type; set {
+                type = value;
+                Sprite = TileManager.Graphics[type];
+            }
+        }
+        TerrainType type;
+        public Sprite Sprite { get; private set; }
 
         public Tile(TerrainType type) {
-            sprite = TileManager.Graphics[type];
+            Sprite = TileManager.Graphics[type];
             Type = type;
         }
 

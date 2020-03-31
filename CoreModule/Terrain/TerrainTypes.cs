@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CoreModule.Terrain {
-    public enum TerrainType : int {
+    public enum TerrainType : byte {
         TT_UNDEFINED = 0,
 
         TT_AIR,

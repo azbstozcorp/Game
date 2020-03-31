@@ -7,27 +7,32 @@ using System.Threading.Tasks;
 using PixelEngine;
 using CoreModule.Drawables;
 using CoreModule.Shapes;
+using CoreModule.Saving;
 using CoreModule.Terrain;
 using CoreModule.Drawables.Entities;
 
-using PPoint = PixelEngine.Point;
 using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule {
-    public class Level : Scene {
+    public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
 
         public List<PhysicsEntity> Entities { get; } = new List<PhysicsEntity>();
+        public string Name { get; private set; } = "";
         public Point CameraLocation;
-        Chunk[,] chunks;
+        public Chunk[,] chunks;
         int tileIndex = 2;
 
         public Level() {
-            Console.WriteLine("Initializing World...");
+            Console.WriteLine($"Initializing World...");
             Instance = this;
             CameraLocation = new Point();
-
             TileManager.Setup();
+        }
+        public Level(string name) : this() {
+            Console.WriteLine($"Constructing new world with name {name}...");
+            Name = name;
+
             chunks = new Chunk[10, 10];
 
             for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
@@ -38,6 +43,17 @@ namespace CoreModule {
 
             Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
             //chunks[0, 0].SetTile(new Tile(TerrainType.TT_DIRT), 2, 4);
+        }
+
+        public static Level LoadLevel(string levelName) {
+            string path = $"Assets/Levels/{levelName}.bin";
+            if (System.IO.File.Exists(path)) return LevelIO.LoadLevel(path);
+            else return new Level(levelName);
+        }
+
+        public void SaveLevel() {
+            string path = $"Assets/Levels/{Name}.bin";
+            LevelIO.SaveLevel(this, path);
         }
 
         /// <summary>
@@ -57,12 +73,14 @@ namespace CoreModule {
             return GetChunk(cX, cY);
         }
 
+        void Exit() {
+            SaveLevel();
+            CoreGame.Instance.PopScene();
+        }
+
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
-            if (CoreGame.Instance.GetKey(Key.Escape).Down) CoreGame.Instance.PopScene();
-
-            //Entities[0].X = CoreGame.Instance.MouseX;
-            //Entities[0].Y = CoreGame.Instance.MouseY;
+            if (CoreGame.Instance.GetKey(Key.Escape).Down) Exit();
 
             int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
             int chunkMouseY = (CoreGame.Instance.MouseY - CameraLocation.Y) / Chunk.ChunkSize;
@@ -76,18 +94,9 @@ namespace CoreModule {
                 chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
             }
 
-            //if (CoreGame.Instance.GetKey(Key.Left).Down)    CameraLocation.X++;
-            //if (CoreGame.Instance.GetKey(Key.Right).Down)   CameraLocation.X--;
-            //if (CoreGame.Instance.GetKey(Key.Up).Down)      CameraLocation.Y++;
-            //if (CoreGame.Instance.GetKey(Key.Down).Down)    CameraLocation.Y--;
-
             if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].X--;
             if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].X++;
-            if (CoreGame.Instance.GetKey(Key.Up).Down) {
-                Entities[0].Velocity.Y = -1;
-                //Entities[0].X = 10; Entities[0].Y = 10;
-                //Entities[0].ResetBounds();
-            }
+            if (CoreGame.Instance.GetKey(Key.Up).Down) Entities[0].Velocity.Y = -1;
             if (CoreGame.Instance.GetKey(Key.Down).Down) ;
 
             foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
@@ -103,6 +112,54 @@ namespace CoreModule {
             foreach (PhysicsEntity e in Entities) e.Draw();
 
             CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+        }
+
+        public byte[] GetSaveData() {
+            byte[] name = Encoding.ASCII.GetBytes(Name);
+            byte nameLength = (byte)name.Length;
+
+            byte chunkWidthX = BitConverter.GetBytes(chunks.GetLength(0)).First();
+            byte chunkWidthY = BitConverter.GetBytes(chunks.GetLength(1)).First();
+
+            List<byte[]> chunkData = new List<byte[]>(); // Will be /* (0,0)(0,1)(0,2)(0,3) ... */
+            for (int x = 0; x < chunks.GetLength(0); x++) {         /* (1,0)(1,1)(1,2)(1,3) ... */
+                for (int y = 0; y < chunks.GetLength(1); y++) {
+                    chunkData.Add(chunks[x, y].GetSaveData());
+                }
+            }
+
+            List<byte> data = new List<byte>();
+            data.Add(nameLength);
+            data.AddRange(name);
+            data.Add(chunkWidthX);
+            data.Add(chunkWidthY);
+            foreach (byte[] chunkBytes in chunkData)
+                data.AddRange(chunkBytes);
+            return data.ToArray();
+        }
+
+        public void LoadSaveData(byte[] data) {
+            int location = 0;
+
+            byte nameLength = data[location]; /*                             */ location++;
+            string name = Encoding.ASCII.GetString(data, location, nameLength); location += nameLength;
+
+            byte chunkWidthX = data[location]; /*                            */ location++;
+            byte chunkWidthY = data[location]; /*                            */ location++;
+            chunks = new Chunk[chunkWidthX, chunkWidthY];
+
+            int chunkByteSize = Chunk.NumTiles * Chunk.NumTiles;
+            for (int x = 0; x < chunkWidthX; x++) {
+                for (int y = 0; y < chunkWidthY; y++) {
+                    chunks[x, y] = new Chunk((x * Chunk.ChunkSize, y * Chunk.ChunkSize));
+                    chunks[x, y].WorldPosition.X = x;
+                    chunks[x, y].WorldPosition.Y = y;
+                    chunks[x, y].LoadSaveData(data.Skip(location).Take(chunkByteSize).ToArray());
+                    location += chunkByteSize;
+                }
+            }
+
+            Name = name;
         }
     }
 }

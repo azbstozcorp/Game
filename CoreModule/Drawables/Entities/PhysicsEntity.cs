@@ -9,6 +9,7 @@ using CoreModule.Terrain;
 using static CoreModule.Collision;
 
 namespace CoreModule.Drawables.Entities {
+    [Serializable]
     public class PhysicsEntity : Drawable {
         public float X {
             get => Bounds.Left; set {
@@ -25,7 +26,7 @@ namespace CoreModule.Drawables.Entities {
 
         public float Gravity { get; set; } = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
-        public PixelEngine.Sprite Sprite { get; set; }
+        [NonSerialized] public PixelEngine.Sprite Sprite;
 
         HashSet<Chunk> containingChunks = new HashSet<Chunk>();
         new RectF Bounds;

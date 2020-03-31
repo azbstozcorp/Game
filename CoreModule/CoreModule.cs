@@ -28,7 +28,7 @@ namespace CoreModule {
 
             Construct(200, 120, 8, 8, 60);
 
-            Enable(Subsystem.Audio);
+            //Enable(Subsystem.Audio);
             PixelMode = Pixel.Mode.Alpha;
 
             scenes = new Stack<Scene>();

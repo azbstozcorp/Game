@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CoreModule.Shapes;
 
 namespace CoreModule.Drawables {
+    [Serializable]
     public class Button : Drawable {
         public delegate void ButtonPressedEventHandler();
         public event ButtonPressedEventHandler ButtonPressed;
