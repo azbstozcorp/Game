@@ -1,4 +1,6 @@
 ﻿// Collision.cs
+using System.Collections.Generic;
+using System.Linq;
 using CoreModule.Shapes;
 namespace CoreModule {
     public static class Collision {
@@ -25,6 +27,8 @@ namespace CoreModule {
             a.Left < b.Right && a.Right > b.Left &&
             a.Top < b.Bottom && a.Bottom > b.Top;
 
+        public static bool LineOverlapsRect(Line line, Rect rect) => WithinRect(rect, line.Start) || WithinRect(rect, line.End);
+
         static bool CCW(Point a, Point b, Point c) => (c.Y - a.Y) * (b.X - a.X) > (b.Y - a.Y) * (c.X - a.X);
         /// <summary>
         /// Check if two lines intersect
@@ -46,6 +50,24 @@ namespace CoreModule {
 
             int delta = a1 * b2 - a2 * b1;
             return delta == 0 ? null : new Point((b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta);
+        }
+        /// <summary>
+        /// Find the intersection point of a line and a rectangle
+        /// </summary>
+        public static Point IntersectionOf(Line line, Rect rect) {
+            List<Point> intersections = new List<Point>();
+
+            Line TopSide = new Line(rect.TopLeft, rect.TopRight);
+            Line LeftSide = new Line(rect.TopLeft, rect.BottomLeft);
+            Line BottomSide = new Line(rect.BottomLeft, rect.BottomRight);
+            Line RightSide = new Line(rect.BottomRight, rect.TopRight);
+
+            if(LinesIntersect(TopSide,line))intersections.Add(IntersectionOf(line, TopSide));
+            if(LinesIntersect(LeftSide,line))intersections.Add(IntersectionOf(line, LeftSide));
+            if(LinesIntersect(BottomSide,line))intersections.Add(IntersectionOf(line, BottomSide));
+            if(LinesIntersect(RightSide,line))intersections.Add(IntersectionOf(line, RightSide));
+
+            return intersections.First();
         }
 
         static int Min(int a, int b) => a > b ? b : a;

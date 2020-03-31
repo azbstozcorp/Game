@@ -41,4 +41,45 @@ namespace CoreModule.Shapes {
             return false;        /* If the object isn't a point, there's no way it is equal */
         }
     }
+
+    [System.Serializable]
+    public class PointF {
+        public float X { get; set; }
+        public float Y { get; set; }
+
+        public PointF() { }
+        public PointF(float x, float y) { X = x; Y = y; }
+        public PointF(PixelEngine.Point from) { X = from.X; Y = from.Y; }
+        public PointF((float x, float y) from) { X = from.x; Y = from.y; }
+
+        public static bool operator ==(PointF a, PointF b) => a.Equals(b);
+        public static bool operator !=(PointF a, PointF b) => !(a == b);
+
+        public static implicit operator PointF(PixelEngine.Point p) => new PointF(p);
+        public static implicit operator PointF((float x, float y) p) => new PointF(p);
+        public static implicit operator PixelEngine.Point(PointF p) => new PixelEngine.Point((int)p.X, (int)p.Y);
+        public static implicit operator (float x, float y) (PointF p) => (p.X, p.Y);
+        public static implicit operator PointF(Point p) => new PointF(p.X, p.Y);
+        public static implicit operator Point(PointF p) => new Point((int)p.X, (int)p.Y);
+
+        public static PointF operator +(PointF a, float b) => new PointF(a.X + b, a.Y + b);
+        public static PointF operator -(PointF a, float b) => a + -b;
+        public static PointF operator +(PointF a, PointF b) => new PointF(a.X + b.X, a.Y + b.Y);
+        public static PointF operator -(PointF a, PointF b) => new PointF(a.X - b.X, a.Y - b.Y);
+
+        public override string ToString() => $"({X},{Y})";
+
+        public override int GetHashCode() {
+            int hash = 17;
+            hash *= 23 + X.GetHashCode();
+            hash *= 23 + Y.GetHashCode();
+            return hash;
+        }
+        public override bool Equals(object obj) {
+            PointF other = obj as PointF;
+            if (other != null)   /* If the object is a PointF, check for equality ---------- */
+                return other.X == X && other.Y == Y;
+            return false;        /* If the object isn't a PointF, there's no way it is equal */
+        }
+    }
 }
