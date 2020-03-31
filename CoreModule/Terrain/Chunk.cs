@@ -14,15 +14,14 @@ namespace CoreModule.Terrain {
         public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
-        public Rect ChunkBounds { get; private set; }
 
         int tileCount = 0;
 
         public Chunk() {
-            ChunkBounds = new Rect();
+            Bounds = new Rect();
         }
         public Chunk(Point location) {
-            ChunkBounds = new Rect(location, ChunkSize, ChunkSize);
+            Bounds = new Rect(location, ChunkSize, ChunkSize);
         }
 
         public override void Update(float fElapsedTime) {
@@ -31,8 +30,8 @@ namespace CoreModule.Terrain {
 
         public override void Draw() {
             base.Draw();
-            Point topLeft = new Point(World.Instance.CameraLocation.X + ChunkBounds.Left, World.Instance.CameraLocation.Y + ChunkBounds.Top);
-            Point bottomRight = new Point(World.Instance.CameraLocation.X + ChunkBounds.Right, World.Instance.CameraLocation.Y + ChunkBounds.Bottom);
+            Point topLeft = new Point(World.Instance.CameraLocation.X + Bounds.Left, World.Instance.CameraLocation.Y + Bounds.Top);
+            Point bottomRight = new Point(World.Instance.CameraLocation.X + Bounds.Right, World.Instance.CameraLocation.Y + Bounds.Bottom);
             CoreGame.Instance.DrawRect(topLeft, bottomRight, CoreGame.Instance.Random(Pixel.PresetPixels));
 
             if (Empty)
