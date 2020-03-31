@@ -8,6 +8,7 @@
         public Point TopRight => new Point(Right, Top);
         public Point BottomLeft => new Point(Left, Bottom);
         public Point BottomRight => new Point(Right, Bottom);
+        public Point Center => new Point(Left + Width / 2, Top + Height / 2);
 
         public int Width => Right - Left;
         public int Height => Bottom - Top;
@@ -26,6 +27,8 @@
         }
         public Rect(Point topLeft, int width, int height) : this(topLeft, (topLeft.X + width, topLeft.Y + height)) { }
         public Rect(int x1, int y1, int x2, int y2) : this((x1, y1), (x2, y2)) { }
+
+        public void Move(int amountX, int amountY) { Left += amountX; Right += amountX; Top += amountY; Bottom += amountY; }
 
         public Rect Copy => new Rect(TopLeft, BottomRight);
 
@@ -55,6 +58,7 @@
         public PointF TopRight => new PointF(Right, Top);
         public PointF BottomLeft => new PointF(Left, Bottom);
         public PointF BottomRight => new PointF(Right, Bottom);
+        public PointF Center => new PointF(Left + Width / 2f, Top + Height / 2f);
 
         public float Width => Right - Left;
         public float Height => Bottom - Top;
@@ -73,6 +77,8 @@
         }
         public RectF(PointF topLeft, int width, int height) : this(topLeft, (topLeft.X + width, topLeft.Y + height)) { }
         public RectF(int x1, int y1, int x2, int y2) : this((x1, y1), (x2, y2)) { }
+
+        public void Move(int amountX, int amountY) { Left += amountX; Right += amountX; Top += amountY; Bottom += amountY; }
 
         public RectF Copy => new RectF(TopLeft, BottomRight);
 

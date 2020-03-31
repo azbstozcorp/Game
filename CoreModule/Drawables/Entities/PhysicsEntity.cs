@@ -31,6 +31,8 @@ namespace CoreModule.Drawables.Entities {
         new RectF Bounds;
         RectF oldBounds;
 
+        bool onGround = false;
+
         public PhysicsEntity(int x, int y, int width, int height, PixelEngine.Sprite sprite) {
             Bounds = new Rect(new Point(x, y), width, height);
             oldBounds = Bounds.Copy;
@@ -44,17 +46,14 @@ namespace CoreModule.Drawables.Entities {
             containingChunks.Add(World.Instance.GetChunkWithPoint(Bounds.BottomRight));
         }
 
-        public void ResetBounds() {
-            oldBounds = Bounds.Copy;
-        }
-
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
             oldBounds = Bounds.Copy;
+
             Velocity.Y += Gravity;
             X += Velocity.X;
-            Y += Velocity.Y + Gravity;
+            Y += Velocity.Y;
 
             List<Rect> collidingRects = new List<Rect>();
             GetContainingChunks();
@@ -79,22 +78,30 @@ namespace CoreModule.Drawables.Entities {
             }
 
             foreach (Rect collider in collidingRects) {
-                if (Bounds.Bottom > collider.Top) {
-                    Y = collider.Top - Bounds.Height;
-                    Velocity.Y = 0;
-                }
-                else if (Bounds.Top < collider.Bottom) {
-                    Y = collider.Bottom;
-                    Velocity.Y = 0;
-                }
+                PointF change = Bounds.Center - oldBounds.Center;
 
-                if (Bounds.Right < collider.Left) {
+                float margin = 2f;
+
+                Rect left = new Rect(new PointF(Bounds.Left - 1, Bounds.Top + margin), new PointF(Bounds.Left, Bounds.Bottom - margin));
+                Rect right = new Rect(new PointF(Bounds.Right, Bounds.Top + margin), new PointF(Bounds.Right + 1, Bounds.Bottom - margin));
+                Rect up = new Rect(new PointF(Bounds.Left + margin, Y - 1), new PointF(Bounds.Right - margin, Y));
+                Rect down = new Rect(new PointF(Bounds.Left + margin, Bounds.Center.Y), new PointF(Bounds.Right - margin, Bounds.Bottom + 1));
+
+                if (RectsOverlap(left, collider)) {
+                    X = collider.Right;
+                    Velocity.X = 0;
+                }
+                if (RectsOverlap(right, collider)) {
                     X = collider.Left - Bounds.Width;
                     Velocity.X = 0;
                 }
-                else if(Bounds.Left > collider.Right){
-                    X = collider.Right;
-                    Velocity.X = 0;
+                if (RectsOverlap(up, collider)) {
+                    Y = collider.Bottom;
+                    Velocity.Y = 0;
+                }
+                if (RectsOverlap(down, collider)) {
+                    Y = collider.Top - Bounds.Height;
+                    Velocity.Y = 0;
                 }
             }
         }

@@ -52,23 +52,18 @@ namespace CoreModule {
             return delta == 0 ? null : new Point((b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta);
         }
         /// <summary>
-        /// Find the intersection point of a line and a rectangle
+        /// Find the intersection rect of a rect and a rect
         /// </summary>
-        public static Point IntersectionOf(Line line, Rect rect) {
-            List<Point> intersections = new List<Point>();
-
-            Line TopSide = new Line(rect.TopLeft, rect.TopRight);
-            Line LeftSide = new Line(rect.TopLeft, rect.BottomLeft);
-            Line BottomSide = new Line(rect.BottomLeft, rect.BottomRight);
-            Line RightSide = new Line(rect.BottomRight, rect.TopRight);
-
-            if(LinesIntersect(TopSide,line))intersections.Add(IntersectionOf(line, TopSide));
-            if(LinesIntersect(LeftSide,line))intersections.Add(IntersectionOf(line, LeftSide));
-            if(LinesIntersect(BottomSide,line))intersections.Add(IntersectionOf(line, BottomSide));
-            if(LinesIntersect(RightSide,line))intersections.Add(IntersectionOf(line, RightSide));
-
-            return intersections.First();
-        }
+        //public static Rect IntersectionRect(Rect a, Rect b) {
+        //    if (a.Bottom > b.Top && a.Top < b.Top && a.Right > b.Left && b.Left < a.Left)
+        //        return new Rect(b.TopLeft, a.BottomRight);
+        //    if (a.Top < b.Bottom && a.Bottom > b.Bottom && a.Right > b.Left && b.Left < a.Left)
+        //        return new Rect(IntersectionOf(new Line(a.TopLeft, a.TopRight), new Line(b.TopLeft, b.BottomLeft)),
+        //                        IntersectionOf(new Line(a.TopRight, a.BottomRight), new Line(b.BottomLeft, b.BottomRight)));
+        //    if (a.Left < b.Right && a.Right > b.Right && a.Top < b.Top && a.Bottom < b.Bottom)
+        //        return new Rect(IntersectionOf(new Line(), new Line()),
+        //                        IntersectionOf(new Line(), new Line());
+        //}
 
         static int Min(int a, int b) => a > b ? b : a;
         static int Max(int a, int b) => a > b ? a : b;
