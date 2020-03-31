@@ -102,6 +102,7 @@ namespace CoreModule.Terrain {
             }
 
             TrimColliders();
+            TrimColliders();
         }
 
         void TrimColliders() {
@@ -115,9 +116,14 @@ namespace CoreModule.Terrain {
                         a.Right = b.Right;
                         Colliders.Remove(b);
                     }
-                    if (a.Bottom == b.Top && a.Right == b.Right && a.Left == b.Left) {
-                        a.Bottom = b.Bottom;
-                        Colliders.Remove(b);
+
+                    if(a.Right == b.Left && a.Bottom == b.Bottom && a.Top != b.Top && b.Top < a.Top) {
+                        a.Right = b.Right;
+                        b.Bottom = a.Top;
+                    }
+                    if(a.Right == b.Left && a.Top == b.Top && a.Bottom != b.Bottom && b.Top > a.Top) {
+                        a.Right = b.Right;
+                        b.Top = a.Bottom;
                     }
                 }
             }
