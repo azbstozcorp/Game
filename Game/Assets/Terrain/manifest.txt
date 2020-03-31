@@ -1,2 +1,6 @@
+0 missing false
 2 ground true
-3 ground2 true
+3 grasstop true
+4 grassmid true
+5 grassbottom true
+6 flower false

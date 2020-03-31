@@ -42,7 +42,7 @@ namespace CoreModule.Terrain {
             base.Draw();
             Point topLeft = new Point(Level.Instance.CameraLocation.X + Bounds.Left, Level.Instance.CameraLocation.Y + Bounds.Top);
             Point bottomRight = new Point(Level.Instance.CameraLocation.X + Bounds.Right, Level.Instance.CameraLocation.Y + Bounds.Bottom);
-            CoreGame.Instance.DrawRect(topLeft, bottomRight, Pixel.Presets.White);
+            //CoreGame.Instance.DrawRect(topLeft, bottomRight, Pixel.Presets.White);
 
             if (Empty)
                 return; // If there are no tiles in the chunk, don't draw
@@ -63,9 +63,9 @@ namespace CoreModule.Terrain {
                                                  current.Sprite);
                 }
 
-            foreach (Rect collider in Colliders) {
-                CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, Pixel.Presets.White);
-            }
+            //foreach (Rect collider in Colliders) {
+            //    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, Pixel.Presets.White);
+            //}
         }
 
         public void SetTile(Tile t, int x, int y) {

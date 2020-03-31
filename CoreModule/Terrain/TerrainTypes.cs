@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CoreModule.Terrain {
+﻿namespace CoreModule.Terrain {
     public enum TerrainType : byte {
         TT_UNDEFINED = 0,
 
         TT_AIR,
         TT_DIRT,
-        TT_GRASS,
+        TT_GRASSTOP,
+        TT_GRASSMID,
+        TT_GRASSBOT,
+        TT_FLOWER,
 
         TT_COUNT // Always keep last
     }
