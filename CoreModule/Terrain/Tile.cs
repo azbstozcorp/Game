@@ -12,14 +12,14 @@ namespace CoreModule.Terrain {
         public TerrainType Type {
             get => type; set {
                 type = value;
-                Sprite = TileManager.Graphics[type];
+                Sprite = TileManager.GetTexture(type);
             }
         }
         TerrainType type;
         public Sprite Sprite { get; private set; }
 
         public Tile(TerrainType type) {
-            Sprite = TileManager.Graphics[type];
+            Sprite = TileManager.GetTexture(type);
             Type = type;
         }
 

@@ -8,6 +8,11 @@ namespace CoreModule.Terrain {
         public static Dictionary<TerrainType, Sprite> Graphics { get; } = new Dictionary<TerrainType, Sprite>();
         public static List<TerrainType> Collideable { get; } = new List<TerrainType>();
 
+        public static Sprite GetTexture(TerrainType type) {
+            if (!Graphics.ContainsKey(type)) return Graphics[0];
+            return Graphics[type];
+        }
+
         public static void Setup() {
             string[] manifest = System.IO.File.ReadAllLines("Assets/Terrain/manifest.txt");
 
