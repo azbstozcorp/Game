@@ -14,15 +14,15 @@ using PPoint = PixelEngine.Point;
 using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule {
-    public class World : Scene {
-        public static World Instance { get; private set; }
+    public class Level : Scene {
+        public static Level Instance { get; private set; }
 
         public List<PhysicsEntity> Entities { get; } = new List<PhysicsEntity>();
         public Point CameraLocation;
         Chunk[,] chunks;
         int tileIndex = 2;
 
-        public World() {
+        public Level() {
             Console.WriteLine("Initializing World...");
             Instance = this;
             CameraLocation = new Point();

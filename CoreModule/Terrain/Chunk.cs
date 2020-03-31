@@ -36,8 +36,8 @@ namespace CoreModule.Terrain {
 
         public override void Draw() {
             base.Draw();
-            Point topLeft = new Point(World.Instance.CameraLocation.X + Bounds.Left, World.Instance.CameraLocation.Y + Bounds.Top);
-            Point bottomRight = new Point(World.Instance.CameraLocation.X + Bounds.Right, World.Instance.CameraLocation.Y + Bounds.Bottom);
+            Point topLeft = new Point(Level.Instance.CameraLocation.X + Bounds.Left, Level.Instance.CameraLocation.Y + Bounds.Top);
+            Point bottomRight = new Point(Level.Instance.CameraLocation.X + Bounds.Right, Level.Instance.CameraLocation.Y + Bounds.Bottom);
             CoreGame.Instance.DrawRect(topLeft, bottomRight, Pixel.Presets.White);
 
             if (Empty)

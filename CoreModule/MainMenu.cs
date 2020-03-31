@@ -26,7 +26,7 @@ namespace CoreModule {
         }
 
         private void PlayButton_ButtonPressed() {
-            CoreGame.Instance.PushScene(new World());
+            CoreGame.Instance.PushScene(new Level());
         }
 
         public override void Update(float fElapsedTime) {

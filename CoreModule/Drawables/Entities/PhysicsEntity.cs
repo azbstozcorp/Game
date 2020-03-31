@@ -38,10 +38,10 @@ namespace CoreModule.Drawables.Entities {
         }
 
         void GetContainingChunks() {
-            containingChunks.Add(World.Instance.GetChunkWithPoint(Bounds.TopLeft));
-            containingChunks.Add(World.Instance.GetChunkWithPoint(Bounds.TopRight));
-            containingChunks.Add(World.Instance.GetChunkWithPoint(Bounds.BottomLeft));
-            containingChunks.Add(World.Instance.GetChunkWithPoint(Bounds.BottomRight));
+            containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.TopLeft));
+            containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.TopRight));
+            containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.BottomLeft));
+            containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.BottomRight));
         }
 
         public override void Update(float fElapsedTime) {
