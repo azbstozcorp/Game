@@ -57,8 +57,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\Rect.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Terrain\Chunk.cs" />
     <Compile Include="Terrain\TerrainTypes.cs" />
     <Compile Include="Terrain\Tile.cs" />
+    <Compile Include="Terrain\TileManager.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup />
