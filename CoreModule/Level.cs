@@ -23,11 +23,14 @@ namespace CoreModule {
         public Chunk[,] chunks;
         int tileIndex = 2;
 
+        bool editing = false;
+
         public Level() {
             Console.WriteLine($"Initializing World...");
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
+            Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
         }
         public Level(string name) : this() {
             Console.WriteLine($"Constructing new world with name {name}...");
@@ -40,8 +43,6 @@ namespace CoreModule {
                     chunks[i, j].WorldPosition.X = i;
                     chunks[i, j].WorldPosition.Y = j;
                 }
-
-            Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
             //chunks[0, 0].SetTile(new Tile(TerrainType.TT_DIRT), 2, 4);
         }
 
@@ -87,17 +88,20 @@ namespace CoreModule {
             int tileMouseX = ((CoreGame.Instance.MouseX - CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
             int tileMouseY = ((CoreGame.Instance.MouseY - CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
 
-            tileIndex += (int)CoreGame.Instance.MouseScroll;
-            if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
-            if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
-            if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
-                chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
+            if (editing) {
+                tileIndex += (int)CoreGame.Instance.MouseScroll;
+                if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
+                if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
+                    chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
+                }
             }
 
             if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].X--;
             if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].X++;
             if (CoreGame.Instance.GetKey(Key.Up).Down) Entities[0].Velocity.Y = -1;
-            if (CoreGame.Instance.GetKey(Key.Down).Down) ;
+
+            if (CoreGame.Instance.GetKey(Key.E).Pressed) editing = !editing;
 
             foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
         }
@@ -105,13 +109,14 @@ namespace CoreModule {
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
 
-
             for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
                     chunks[i, j].Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
 
-            CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+            if (editing) {
+                CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+            }
         }
 
         public byte[] GetSaveData() {

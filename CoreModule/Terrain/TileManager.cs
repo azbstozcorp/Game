@@ -12,6 +12,7 @@ namespace CoreModule.Terrain {
             string[] manifest = System.IO.File.ReadAllLines("Assets/Terrain/manifest.txt");
 
             Graphics[TT_AIR] = null;
+            Graphics[TT_UNDEFINED] = null;
 
             foreach (string s in manifest) {
                 string[] data = s.Split(' ');

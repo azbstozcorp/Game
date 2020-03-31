@@ -142,7 +142,7 @@ namespace CoreModule.Terrain {
             byte[] tileData = new byte[NumTiles * NumTiles];
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
-                    tileData[x * y] = (byte)Tiles[x, y].Type;
+                    tileData[y * (NumTiles/* - 1*/) + x] = (byte)Tiles[x, y].Type;
                 }
             }
             return tileData;
@@ -151,7 +151,7 @@ namespace CoreModule.Terrain {
         public void LoadSaveData(byte[] data) {
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
-                    TerrainType type = (TerrainType)data[x * y];
+                    TerrainType type = (TerrainType)data[y * (NumTiles/* - 1*/) + x];
                     Tiles[x, y].Type = type;
                     if (Tiles[x, y].Type != TT_AIR || type != TT_UNDEFINED) Empty = false;
                 }
