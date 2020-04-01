@@ -8,7 +8,6 @@ using static CoreModule.Terrain.TerrainType;
 
 using Point = CoreModule.Shapes.Point;
 
-
 namespace CoreModule.Terrain {
 
     public class Chunk : Drawables.Drawable, Saving.ISerializable<Chunk> {

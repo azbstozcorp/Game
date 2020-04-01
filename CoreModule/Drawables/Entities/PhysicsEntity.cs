@@ -122,6 +122,7 @@ namespace CoreModule.Drawables.Entities {
                         newBounds.Move(-overlap.Width, 0);
                     }
                     Velocity.X = 0;
+                    break;
                 }
             }
             Bounds = newBounds;
