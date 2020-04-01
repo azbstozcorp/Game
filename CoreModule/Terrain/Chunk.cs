@@ -4,18 +4,17 @@ using System.Collections.Generic;
 using PixelEngine;
 using CoreModule.Shapes;
 using CoreModule.Scenes;
-using static CoreModule.Terrain.TerrainType;
 
 using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Terrain {
 
     public class Chunk : Drawables.Drawable, Saving.ISerializable<Chunk> {
-        public const int NumTiles = 20;
+        public const int NumTiles = 40;
         public const int ChunkSize = Tile.TileSize * NumTiles;
 
         public Point WorldPosition { get; } = new Point();
-        public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
+        public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles]; 
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
 
@@ -26,7 +25,7 @@ namespace CoreModule.Terrain {
 
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
-                    Tiles[x, y] = new Tile((TT_AIR));
+                    Tiles[x, y] = new Tile((1));
                 }
             }
         }
@@ -56,7 +55,6 @@ namespace CoreModule.Terrain {
             for (int x = 0; x < NumTiles; x++) for (int y = 0; y < NumTiles; y++) {
                     Tile current = Tiles[x, y];
                     if (current == null) continue;
-                    if (current.Type == TT_AIR) continue;
                     if (current.Sprite == null) continue;
 
                     var transform = new PixelEngine.Extensions.Transforms.Transform();
@@ -142,7 +140,7 @@ namespace CoreModule.Terrain {
             byte[] tileData = new byte[NumTiles * NumTiles];
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
-                    tileData[y * (NumTiles/* - 1*/) + x] = (byte)Tiles[x, y].Type;
+                    tileData[y * (NumTiles) + x] = (byte)Tiles[x, y].Type;
                 }
             }
             return tileData;
@@ -151,9 +149,9 @@ namespace CoreModule.Terrain {
         public void LoadSaveData(byte[] data) {
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
-                    TerrainType type = (TerrainType)data[y * (NumTiles/* - 1*/) + x];
+                    byte type = (byte)data[y * (NumTiles) + x];
                     Tiles[x, y].Type = type;
-                    if (Tiles[x, y].Type != TT_AIR || type != TT_UNDEFINED) Empty = false;
+                    if (Tiles[x, y].Type != 0 || type != 1) Empty = false;
                 }
             }
 
