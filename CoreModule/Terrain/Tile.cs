@@ -7,7 +7,7 @@ using PixelEngine;
 
 namespace CoreModule.Terrain {
     public class Tile : Drawables.Drawable {
-        public const int TileSize = 4;
+        public const int TileSize = 5;
 
         public byte Type {
             get => type; set {
