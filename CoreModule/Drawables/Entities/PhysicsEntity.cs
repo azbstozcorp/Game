@@ -24,6 +24,7 @@ namespace CoreModule.Drawables.Entities {
             }
         }
 
+        public bool DrawDebug { get; set; } = false;
         public float Gravity { get; set; } = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
@@ -141,7 +142,7 @@ namespace CoreModule.Drawables.Entities {
             if (Sprite != null)
                 CoreGame.Instance.DrawSprite(Bounds.TopLeft + topLeft, Sprite);
 
-            CoreGame.Instance.DrawRect(Bounds.TopLeft + topLeft, Bounds.BottomRight + topLeft, PixelEngine.Pixel.Presets.Yellow);
+            if (DrawDebug) CoreGame.Instance.DrawRect(Bounds.TopLeft + topLeft, Bounds.BottomRight + topLeft, PixelEngine.Pixel.Presets.Yellow);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace CoreModule.Scenes {
         public static Level Instance { get; private set; }
 
         public List<PhysicsEntity> Entities { get; } = new List<PhysicsEntity>();
-        public PhysicsEntity Player { get; } = new PhysicsEntity(10, 100, 10, 20, null);
+        public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
         public string Name { get; private set; } = "";
         public Point CameraLocation;
         public Chunk[,] chunks;
@@ -35,7 +35,8 @@ namespace CoreModule.Scenes {
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
-            Entities.Add(Player);
+            Entities.Add(TestPlayer);
+            TestPlayer.DrawDebug = true;
 
             Button editorButtonSave = new Button("Save",
                 CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1,
@@ -119,18 +120,18 @@ namespace CoreModule.Scenes {
                 int vel = 0;
                 if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
                 if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
-                Entities[0].Velocity.X = vel;
+                TestPlayer.Velocity.X = vel;
                 if (CoreGame.Instance.GetKey(Key.W).Pressed) Entities[0].Velocity.Y = -1.5f;
 
                 int cameraRatio = 1;
                 int newX = -(int)Entities[0].X +
                             CoreGame.Instance.ScreenWidth / 2 +
-                            Entities[0].Bounds.Width / 2 -
+                            TestPlayer.Bounds.Width / 2 -
                             CoreGame.Instance.MouseX / cameraRatio +
                             CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
                 int newY = -(int)Entities[0].Y +
                             CoreGame.Instance.ScreenHeight / 2 +
-                            Entities[0].Bounds.Height / 2 -
+                            TestPlayer.Bounds.Height / 2 -
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
 
@@ -152,7 +153,25 @@ namespace CoreModule.Scenes {
 
             if (Editing) {
                 foreach (Button b in editorButtons) b.Draw();
-                CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+                //CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+                Sprite currentTileSprite = TileManager.GetTexture((byte)tileIndex);
+                if (currentTileSprite != null) {
+                    Sprite previewTexture = new Sprite(Tile.TileSize, Tile.TileSize);
+                    Sprite.Copy(currentTileSprite, previewTexture);
+                    for (int x = 0; x < previewTexture.Width; x++) {
+                        for (int y = 0; y < previewTexture.Height; y++) {
+                            Pixel current = previewTexture[x, y];
+                            previewTexture[x, y] = new Pixel(current.R, current.G, current.B, 100);
+                        }
+                    }
+
+                    int tileLocX = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseX / Tile.TileSize)) * Tile.TileSize;
+                    int tileLocY = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseY / Tile.TileSize)) * Tile.TileSize;
+
+                    PixelEngine.Extensions.Transforms.Transform transform = new PixelEngine.Extensions.Transforms.Transform();
+                    transform.Translate(tileLocX, tileLocY);
+                    PixelEngine.Extensions.Transforms.Transform.DrawSprite(previewTexture, transform);
+                }
             }
         }
 
