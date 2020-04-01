@@ -33,8 +33,8 @@ namespace CoreModule.Scenes {
             TileManager.Setup();
             Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
 
-            Button editorButtonSave = new Button("Save", CoreGame.Instance.ScreenWidth - "Save".Length * 4, 0 + 4);
-            editorButtonSave.ButtonPressed += EditorButtonSave_ButtonPressed; 
+            Button editorButtonSave = new Button("Save", CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1, 0 + 4 + 1);
+            editorButtonSave.ButtonPressed += EditorButtonSave_ButtonPressed;
             editorButtons.Add(editorButtonSave);
         }
 
@@ -102,7 +102,7 @@ namespace CoreModule.Scenes {
                 tileIndex += (int)CoreGame.Instance.MouseScroll;
                 if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
                 if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (TerrainType)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY).Type) {
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (TerrainType)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
                     GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
                 }
 
