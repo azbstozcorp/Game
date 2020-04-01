@@ -91,7 +91,7 @@ namespace CoreModule.Terrain {
 
                 for (int y = 0; y < NumTiles; y++) {
                     if (TileManager.IsSolid(GetTile(x, y))) {
-                        if ((!TileManager.IsSolid(GetTile(x, y - 1)) || !TileManager.IsSolid(GetTile(x, y + 1)) || y == NumTiles - 1))
+                        if ((!TileManager.IsSolid(GetTile(x, y - 1)) || !TileManager.IsSolid(GetTile(x, y + 1)) || y == NumTiles - 1)) 
                             boundaries.Add(y);
                         if ((!TileManager.IsSolid(GetTile(x, y - 1)) && !TileManager.IsSolid(GetTile(x, y + 1))))
                             boundaries.Add(y);
