@@ -104,7 +104,7 @@ namespace CoreModule.Scenes {
                 if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
                 if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
-                    chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
+                    GetChunk(chunkMouseX, chunkMouseY)?.SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
                 }
                 foreach (Button b in editorButtons) b.Update(fElapsedTime);
 
@@ -127,7 +127,7 @@ namespace CoreModule.Scenes {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
 
             for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
-                    chunks[i, j].Draw();
+                    GetChunk(i, j)?.Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
 
