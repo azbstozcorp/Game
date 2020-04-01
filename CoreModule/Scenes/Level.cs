@@ -24,6 +24,7 @@ namespace CoreModule.Scenes {
         int tileIndex = 2;
 
         bool editing = false;
+        List<Button> editorButtons = new List<Button>();
 
         public Level() {
             Console.WriteLine($"Initializing World...");
@@ -31,7 +32,16 @@ namespace CoreModule.Scenes {
             CameraLocation = new Point();
             TileManager.Setup();
             Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
+
+            Button editorButtonSave = new Button("Save", CoreGame.Instance.ScreenWidth - "Save".Length * 4, 0 + 4);
+            editorButtonSave.ButtonPressed += EditorButtonSave_ButtonPressed; 
+            editorButtons.Add(editorButtonSave);
         }
+
+        private void EditorButtonSave_ButtonPressed() {
+            SaveLevel();
+        }
+
         public Level(string name) : this() {
             Console.WriteLine($"Constructing new world with name {name}...");
             Name = name;
@@ -92,9 +102,11 @@ namespace CoreModule.Scenes {
                 tileIndex += (int)CoreGame.Instance.MouseScroll;
                 if (tileIndex == 0) tileIndex = (int)TerrainType.TT_COUNT - 1;
                 if (tileIndex == (int)TerrainType.TT_COUNT) tileIndex = 1;
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
-                    chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (TerrainType)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY).Type) {
+                    GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
                 }
+
+                foreach (Button b in editorButtons) b.Update(fElapsedTime);
             }
 
             if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X = -1;
@@ -102,8 +114,20 @@ namespace CoreModule.Scenes {
             if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
 
             if (!editing) {
-                CameraLocation.X = -(int)Entities[0].X + CoreGame.Instance.ScreenWidth / 2 + Entities[0].Bounds.Width / 2 - CoreGame.Instance.MouseX / 2 + CoreGame.Instance.ScreenWidth / 4;
-                CameraLocation.Y = -(int)Entities[0].Y + CoreGame.Instance.ScreenHeight / 2 + Entities[0].Bounds.Height / 2 - CoreGame.Instance.MouseY / 2 + CoreGame.Instance.ScreenHeight / 4;
+                int cameraRatio = 1;
+                int newX = -(int)Entities[0].X +
+                            CoreGame.Instance.ScreenWidth / 2 +
+                            Entities[0].Bounds.Width / 2 -
+                            CoreGame.Instance.MouseX / cameraRatio +
+                            CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
+                int newY = -(int)Entities[0].Y +
+                            CoreGame.Instance.ScreenHeight / 2 +
+                            Entities[0].Bounds.Height / 2 -
+                            CoreGame.Instance.MouseY / cameraRatio +
+                            CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
+
+                CameraLocation.X = newX;
+                CameraLocation.Y = newY;
             }
             else {
                 if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
@@ -120,12 +144,13 @@ namespace CoreModule.Scenes {
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
 
-            for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
-                    chunks[i, j].Draw();
+            for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
+                    GetChunk(i, j).Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
 
             if (editing) {
+                foreach (Button b in editorButtons) b.Draw();
                 CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
             }
         }

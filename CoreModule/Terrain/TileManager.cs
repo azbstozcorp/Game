@@ -5,33 +5,37 @@ using static CoreModule.Terrain.TerrainType;
 
 namespace CoreModule.Terrain {
     public static class TileManager {
-        public static Dictionary<TerrainType, Sprite> Graphics { get; } = new Dictionary<TerrainType, Sprite>();
+        public static Dictionary<TerrainType, List<Sprite>> Graphics { get; } = new Dictionary<TerrainType, List<Sprite>>();
         public static List<TerrainType> Collideable { get; } = new List<TerrainType>();
 
         public static Sprite GetTexture(TerrainType type) {
-            if (!Graphics.ContainsKey(type)) return Graphics[0];
-            return Graphics[type];
+            if (!Graphics.ContainsKey(type)) return Graphics[0][0];
+            return CoreGame.Instance.Random(Graphics[type]);
         }
 
         public static void Setup() {
             string[] manifest = System.IO.File.ReadAllLines("Assets/Terrain/manifest.txt");
 
-            Graphics[TT_AIR] = null;
-            Graphics[TT_UNDEFINED] = null;
+            Graphics[TT_AIR] = new List<Sprite>() {
+            null,};
+            Graphics[TT_UNDEFINED] = new List<Sprite>();
 
             foreach (string s in manifest) {
                 string[] data = s.Split(' ');
                 TerrainType key = (TerrainType)int.Parse(data[0]);
                 string name;
-                for (int i = 0; i < int.Parse(data[3]); i++) {
+                for (int i = 1; i <= int.Parse(data[3]); i++) {
                     if (int.Parse(data[3]) > 1)
 
-                        name = $"Assets/Terrain/{data[1]}_{i}.png";
+                        name = $"Assets/Terrain/{data[1]}_{i}.png"; 
                     else
                         name = $"Assets/Terrain/{data[1]}.png";
                     bool collide = bool.Parse(data[2]);
 
-                    Graphics[key] = Sprite.Load(name);
+                    if (!Graphics.ContainsKey(key)) 
+                        Graphics[key] = new List<Sprite>();
+
+                    Graphics[key].Add(Sprite.Load(name));
                     if (collide) Collideable.Add(key);
                 }
             }

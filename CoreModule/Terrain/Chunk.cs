@@ -71,7 +71,6 @@ namespace CoreModule.Terrain {
         public void SetTile(Tile t, int x, int y) {
             if (x < 0 || y < 0 || x >= NumTiles || y >= NumTiles) return;
 
-            Tile alreadyThere = Tiles[x, y];
             t.Bounds = new Rect(new Point(x * Tile.TileSize, y * Tile.TileSize), Tile.TileSize, Tile.TileSize);
             Tiles[x, y] = t;
 
