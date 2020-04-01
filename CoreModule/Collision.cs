@@ -1,6 +1,4 @@
 ﻿// Collision.cs
-using System.Collections.Generic;
-using System.Linq;
 using CoreModule.Shapes;
 namespace CoreModule {
     public static class Collision {

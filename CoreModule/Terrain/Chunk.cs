@@ -69,7 +69,7 @@ namespace CoreModule.Terrain {
         }
 
         public void SetTile(Tile t, int x, int y) {
-            if (!(Collision.Between(-1, NumTiles, x) || Collision.Between(-1, NumTiles, y)) || t == null) return;
+            if (x < 0 || y < 0 || x >= NumTiles || y >= NumTiles) return;
 
             Tile alreadyThere = Tiles[x, y];
             t.Bounds = new Rect(new Point(x * Tile.TileSize, y * Tile.TileSize), Tile.TileSize, Tile.TileSize);
