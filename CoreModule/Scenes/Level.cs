@@ -102,8 +102,8 @@ namespace CoreModule.Scenes {
             if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
 
             if (!editing) {
-                CameraLocation.X = -(int)Entities[0].X + CoreGame.Instance.ScreenWidth / 2;
-                CameraLocation.Y = -(int)Entities[0].Y + CoreGame.Instance.ScreenHeight / 2;
+                CameraLocation.X = -(int)Entities[0].X + CoreGame.Instance.ScreenWidth / 2 + Entities[0].Bounds.Width / 2;
+                CameraLocation.Y = -(int)Entities[0].Y + CoreGame.Instance.ScreenHeight / 2 + Entities[0].Bounds.Height / 2;
             }
             else {
                 if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
