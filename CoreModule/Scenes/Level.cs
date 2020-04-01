@@ -13,7 +13,7 @@ using CoreModule.Drawables.Entities;
 
 using Point = CoreModule.Shapes.Point;
 
-namespace CoreModule {
+namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
 

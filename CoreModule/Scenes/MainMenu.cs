@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using PixelEngine;
 using CoreModule.Drawables;
 using CoreModule.Shapes;
+using CoreModule.Scenes;
 
 using Point = CoreModule.Shapes.Point;
 
-namespace CoreModule {
+namespace CoreModule.Scenes {
     public class MainMenu : Scene {
         static Random RNG = new Random();
         [NonSerialized] static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");

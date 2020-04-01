@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 using PixelEngine;
 using CoreModule.Terrain;
+using CoreModule.Scenes;
 
 using Chunk = CoreModule.Terrain.Chunk;
 

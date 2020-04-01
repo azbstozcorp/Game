@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using PixelEngine;
+using CoreModule.Scenes;
 
 namespace CoreModule {
     public static class Main {

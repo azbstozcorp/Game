@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using PixelEngine;
 using CoreModule.Shapes;
+using CoreModule.Scenes;
 using static CoreModule.Terrain.TerrainType;
 
 using Point = CoreModule.Shapes.Point;

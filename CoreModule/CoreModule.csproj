@@ -43,11 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collision.cs" />
-    <Compile Include="CoreModule.cs" />
-    <Compile Include="Level.cs" />
-    <Compile Include="MainMenu.cs" />
-    <Compile Include="Scene.cs" />
+    <Compile Include="*.cs" />
     <Compile Include="*\*.cs" />
     <Compile Include="Drawables\Entities\PhysicsEntity.cs" />
   </ItemGroup>

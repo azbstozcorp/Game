@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using CoreModule.Drawables;
 
-namespace CoreModule {
+namespace CoreModule.Scenes {
     [Serializable]
     public class Scene {
         public List<Drawable> Drawables { get; set; } = new List<Drawable>();

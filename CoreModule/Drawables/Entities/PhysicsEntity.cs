@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using CoreModule.Shapes;
 using CoreModule.Terrain;
+using CoreModule.Scenes;
 using static CoreModule.Collision;
 
 namespace CoreModule.Drawables.Entities {
