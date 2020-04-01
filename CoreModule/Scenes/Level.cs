@@ -97,9 +97,20 @@ namespace CoreModule.Scenes {
                 }
             }
 
-            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X=-1;
-            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X=+1;
+            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X = -1;
+            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X = +1;
             if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
+
+            if (!editing) {
+                CameraLocation.X = -(int)Entities[0].X + CoreGame.Instance.ScreenWidth / 2;
+                CameraLocation.Y = -(int)Entities[0].Y + CoreGame.Instance.ScreenHeight / 2;
+            }
+            else {
+                if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
+                if (CoreGame.Instance.GetKey(Key.S).Down) CameraLocation.Y--;
+                if (CoreGame.Instance.GetKey(Key.A).Down) CameraLocation.X++;
+                if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
+            }
 
             if (CoreGame.Instance.GetKey(Key.E).Pressed) editing = !editing;
 

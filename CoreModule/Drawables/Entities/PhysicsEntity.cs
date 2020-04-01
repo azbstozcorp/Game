@@ -136,11 +136,12 @@ namespace CoreModule.Drawables.Entities {
 
         public override void Draw() {
             base.Draw();
+            PointF topLeft = Level.Instance.CameraLocation;
 
             if (Sprite != null)
-                CoreGame.Instance.DrawSprite(Bounds.TopLeft, Sprite);
+                CoreGame.Instance.DrawSprite(Bounds.TopLeft + topLeft, Sprite);
 
-            CoreGame.Instance.DrawRect(Bounds.TopLeft, Bounds.BottomRight, PixelEngine.Pixel.Presets.Yellow);
+            CoreGame.Instance.DrawRect(Bounds.TopLeft + topLeft, Bounds.BottomRight + topLeft, PixelEngine.Pixel.Presets.Yellow);
         }
     }
 }
