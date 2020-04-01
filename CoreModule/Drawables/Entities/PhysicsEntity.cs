@@ -24,7 +24,6 @@ namespace CoreModule.Drawables.Entities {
         }
 
         public float Gravity { get; set; } = 0.1f;
-        float _gravity = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
 
@@ -49,8 +48,8 @@ namespace CoreModule.Drawables.Entities {
             List<Rect> collidingRects = new List<Rect>();
 
             Velocity.Y += Gravity;
-            RectF checkRect = Bounds.Copy;
-            checkRect.Move(Velocity.X, Velocity.Y);
+            RectF newBounds = Bounds.Copy;
+            newBounds.Move(Velocity.X, Velocity.Y);
 
             void GetCollisions(RectF with) {
                 collidingRects.Clear();
@@ -89,14 +88,13 @@ namespace CoreModule.Drawables.Entities {
                     down = true;
                 }
                 GetCollisions(vertical);
-                CoreGame.Instance.DrawRect(vertical.TopLeft, vertical.BottomRight, PixelEngine.Pixel.Presets.White);
                 foreach (Rect collision in collidingRects) {
                     Rect overlap = IntersectionRect(vertical, collision);
                     if (down) {
-                        checkRect.Move(0, -overlap.Height);
+                        newBounds.Move(0, -overlap.Height);
                     }
                     if (up) {
-                        checkRect.Move(0, overlap.Height);
+                        newBounds.Move(0, overlap.Height);
                     }
                     Velocity.Y = 0;
                     break;
@@ -114,21 +112,18 @@ namespace CoreModule.Drawables.Entities {
                     right = true;
                 }
                 GetCollisions(horizontal);
-                CoreGame.Instance.DrawRect(horizontal.TopLeft, horizontal.BottomRight, PixelEngine.Pixel.Presets.White);
                 foreach (Rect collision in collidingRects) {
                     Rect overlap = IntersectionRect(horizontal, collision);
                     if (left) {
-                        checkRect.Move(overlap.Width, 0);
+                        newBounds.Move(overlap.Width, 0);
                     }
                     if (right) {
-                        checkRect.Move(-overlap.Width, 0);
+                        newBounds.Move(-overlap.Width, 0);
                     }
                     Velocity.X = 0;
                 }
             }
-
-            Velocity.X = 0;
-            Bounds = checkRect;
+            Bounds = newBounds;
         }
 
         public override void Update(float fElapsedTime) {
