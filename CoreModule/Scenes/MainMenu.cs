@@ -30,7 +30,7 @@ namespace CoreModule.Scenes {
         }
 
         private void PlayButton_ButtonPressed() {
-            CoreGame.Instance.PushScene(Level.LoadLevel("TestingRoom"));
+            CoreGame.Instance.PushScene(new LevelSelect());
         }
         private void QuitButton_ButtonPressed() {
             CoreGame.Instance.Finish();

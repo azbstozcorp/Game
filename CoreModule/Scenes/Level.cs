@@ -25,7 +25,7 @@ namespace CoreModule.Scenes {
         int tileIndex = 2;
 
         #region Editor Variables
-        bool editing = false;
+        public bool Editing { get; private set; } = false;
         List<Button> editorButtons = new List<Button>();
         #endregion Editor Variables
 
@@ -87,35 +87,41 @@ namespace CoreModule.Scenes {
         #endregion Chunk Utilities
 
         void Exit() {
-            SaveLevel();
-            CoreGame.Instance.PopScene();
+            CoreGame.Instance.PushScene(new ExitConfirmDialogue());
         }
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
-            if (CoreGame.Instance.GetKey(Key.Escape).Down) Exit();
+            if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
 
-            int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
-            int chunkMouseY = (CoreGame.Instance.MouseY - CameraLocation.Y) / Chunk.ChunkSize;
-            int tileMouseX = ((CoreGame.Instance.MouseX - CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
-            int tileMouseY = ((CoreGame.Instance.MouseY - CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
+            if (Editing) {
+                int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
+                int chunkMouseY = (CoreGame.Instance.MouseY - CameraLocation.Y) / Chunk.ChunkSize;
+                int tileMouseX = ((CoreGame.Instance.MouseX - CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
+                int tileMouseY = ((CoreGame.Instance.MouseY - CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
 
-            if (editing) {
+                if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
+                if (CoreGame.Instance.GetKey(Key.S).Down) CameraLocation.Y--;
+                if (CoreGame.Instance.GetKey(Key.A).Down) CameraLocation.X++;
+                if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
+
                 tileIndex += (int)CoreGame.Instance.MouseScroll;
                 if (tileIndex == 0) tileIndex = TileManager.Graphics.Keys.Count - 1;
                 if (tileIndex == TileManager.Graphics.Keys.Count) tileIndex = 1;
+
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
                     GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);
                 }
 
                 foreach (Button b in editorButtons) b.Update(fElapsedTime);
             }
+            else {
+                int vel = 0;
+                if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
+                if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
+                Entities[0].Velocity.X = vel;
+                if (CoreGame.Instance.GetKey(Key.W).Pressed) Entities[0].Velocity.Y = -1.5f;
 
-            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X = -1;
-            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X = +1;
-            if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
-
-            if (!editing) {
                 int cameraRatio = 1;
                 int newX = -(int)Entities[0].X +
                             CoreGame.Instance.ScreenWidth / 2 +
@@ -130,17 +136,11 @@ namespace CoreModule.Scenes {
 
                 CameraLocation.X = newX;
                 CameraLocation.Y = newY;
-            }
-            else {
-                if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
-                if (CoreGame.Instance.GetKey(Key.S).Down) CameraLocation.Y--;
-                if (CoreGame.Instance.GetKey(Key.A).Down) CameraLocation.X++;
-                if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
+
+                foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
             }
 
-            if (CoreGame.Instance.GetKey(Key.E).Pressed) editing = !editing;
-
-            foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
+            if (CoreGame.Instance.GetKey(Key.E).Pressed) Editing = !Editing;
         }
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
@@ -150,7 +150,7 @@ namespace CoreModule.Scenes {
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
 
-            if (editing) {
+            if (Editing) {
                 foreach (Button b in editorButtons) b.Draw();
                 CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
             }
@@ -218,6 +218,51 @@ namespace CoreModule.Scenes {
             }
 
             Name = name;
+        }
+
+        class ExitConfirmDialogue : Scene {
+            Button yes, no, cancel;
+            Button[] controls;
+
+            static string ask = "Would you like to save?";
+
+            public ExitConfirmDialogue() {
+                yes = new Button("Yes", ask.Length * 8 + 1 + "Yes".Length * 4 + 1 + 10, 5);
+                no = new Button("No", ask.Length * 8 + 2 + "Yes".Length * 8 + 1 + "No".Length * 4 + 1 + 22, 5);
+                cancel = new Button("Cancel", ask.Length * 8 + 2 + "Yes".Length * 8 + 2 + "No".Length * 8 + 1 + "Cancel".Length * 4 + 1 + 34, 5);
+                controls = new[] { yes, no, cancel };
+
+                yes.Pressed += Yes_Pressed;
+                no.Pressed += No_Pressed;
+                cancel.Pressed += Cancel_Pressed;
+            }
+
+            private void Yes_Pressed() {
+                Instance.SaveLevel();
+                CoreGame.Instance.PopScene();
+                CoreGame.Instance.PopScene();
+            }
+
+            private void No_Pressed() {
+                CoreGame.Instance.PopScene();
+                CoreGame.Instance.PopScene();
+            }
+
+            private void Cancel_Pressed() {
+                CoreGame.Instance.PopScene();
+                Instance.Editing = true;
+            }
+
+            public override void Update(float fElapsedTime) {
+                foreach (Button b in controls) b.Update(fElapsedTime);
+                if (CoreGame.Instance.GetKey(Key.Escape).Pressed) cancel.Press();
+            }
+
+            public override void Draw() {
+                CoreGame.Instance.FillRect(new Point(0, 0), CoreGame.Instance.ScreenWidth, 10, Pixel.Presets.Black);
+                CoreGame.Instance.DrawText(new Point(0, 0), ask, Pixel.Presets.White);
+                foreach (Button b in controls) b.Draw();
+            }
         }
         #endregion Saving / Loading
     }

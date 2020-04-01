@@ -14,7 +14,7 @@ namespace CoreModule.Terrain {
         public const int ChunkSize = Tile.TileSize * NumTiles;
 
         public Point WorldPosition { get; } = new Point();
-        public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles]; 
+        public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
 
@@ -62,9 +62,10 @@ namespace CoreModule.Terrain {
                     PixelEngine.Extensions.Transforms.Transform.DrawSprite(current.Sprite, transform);
                 }
 
-            //foreach (Rect collider in Colliders) {
-            //    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, Pixel.Presets.White);
-            //}
+            if (Level.Instance.Editing)
+                foreach (Rect collider in Colliders) {
+                    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, Pixel.Presets.White);
+                }
         }
 
         public void SetTile(Tile t, int x, int y) {
@@ -90,7 +91,7 @@ namespace CoreModule.Terrain {
 
                 for (int y = 0; y < NumTiles; y++) {
                     if (TileManager.IsSolid(GetTile(x, y))) {
-                        if ((!TileManager.IsSolid(GetTile(x, y - 1)) || !TileManager.IsSolid(GetTile(x, y + 1)) || y == NumTiles - 1)) 
+                        if ((!TileManager.IsSolid(GetTile(x, y - 1)) || !TileManager.IsSolid(GetTile(x, y + 1)) || y == NumTiles - 1))
                             boundaries.Add(y);
                         if ((!TileManager.IsSolid(GetTile(x, y - 1)) && !TileManager.IsSolid(GetTile(x, y + 1))))
                             boundaries.Add(y);

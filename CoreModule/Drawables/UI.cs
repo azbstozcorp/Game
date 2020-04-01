@@ -20,6 +20,8 @@ namespace CoreModule.Drawables {
             Bounds = new Rect(new Point(centerX - text.Length * 8 / 2, centerY - 8 / 2), text.Length * 8, 8);
         }
 
+        public void Press() => Pressed?.Invoke();
+
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
@@ -46,8 +48,9 @@ namespace CoreModule.Drawables {
         bool selected = false;
         int location = 0;
 
-        public TextBox(string text, int centerX, int centerY, float scale = 1) : base(text, centerX, centerY) {
+        public TextBox(string text, int centerX, int centerY, bool startAtEnd = true) : base(text, centerX, centerY) {
             Pressed += () => selected = true;
+            if (startAtEnd) location = text.Length;
         }
 
         public override void Update(float fElapsedTime) {
