@@ -20,13 +20,19 @@ namespace CoreModule {
 
             Button playButton = new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2);
             playButton.ButtonPressed += PlayButton_ButtonPressed;
+            Button quitButton = new Button("Quit", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 20);
+            quitButton.ButtonPressed += QuitButton_ButtonPressed;
+
             Drawables.Add(playButton);
             Drawables.Add(new Button("Settings", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 10));
-            Drawables.Add(new Button("Quit", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 20));
+            Drawables.Add(quitButton);
         }
 
         private void PlayButton_ButtonPressed() {
             CoreGame.Instance.PushScene(Level.LoadLevel("TestingRoom"));
+        }
+        private void QuitButton_ButtonPressed() {
+            CoreGame.Instance.Finish();
         }
 
         public override void Update(float fElapsedTime) {
