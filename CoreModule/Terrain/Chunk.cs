@@ -57,10 +57,11 @@ namespace CoreModule.Terrain {
                     Tile current = Tiles[x, y];
                     if (current == null) continue;
                     if (current.Type == TT_AIR) continue;
+                    if (current.Sprite == null) continue;
 
-                    CoreGame.Instance.DrawSprite(new Point(x * Tile.TileSize + topLeft.X,
-                                                           y * Tile.TileSize + topLeft.Y),
-                                                 current.Sprite);
+                    var transform = new PixelEngine.Extensions.Transforms.Transform();
+                    transform.Translate(x * Tile.TileSize + topLeft.X, y * Tile.TileSize + topLeft.Y);
+                    PixelEngine.Extensions.Transforms.Transform.DrawSprite(current.Sprite, transform);
                 }
 
             //foreach (Rect collider in Colliders) {
