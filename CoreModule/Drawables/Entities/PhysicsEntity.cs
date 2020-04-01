@@ -53,6 +53,7 @@ namespace CoreModule.Drawables.Entities {
             checkRect.Move(Velocity.X, Velocity.Y);
 
             void GetCollisions(RectF with) {
+                collidingRects.Clear();
                 GetContainingChunks();
                 foreach (Chunk chunk in containingChunks) {
                     if (chunk == null) continue;
@@ -98,10 +99,10 @@ namespace CoreModule.Drawables.Entities {
                         checkRect.Move(0, overlap.Height);
                     }
                     Velocity.Y = 0;
+                    break;
                 }
             }
 
-            collidingRects.Clear();
             if (Velocity.X != 0) {
                 RectF horizontal = new RectF();
                 if (Velocity.X < 0) {
