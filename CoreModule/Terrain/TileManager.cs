@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 
 using PixelEngine;
-using static CoreModule.Terrain.TerrainType;
 
 namespace CoreModule.Terrain {
     public static class TileManager {
-        public static Dictionary<TerrainType, List<Sprite>> Graphics { get; } = new Dictionary<TerrainType, List<Sprite>>();
-        public static List<TerrainType> Collideable { get; } = new List<TerrainType>();
+        public static Dictionary<byte, List<Sprite>> Graphics { get; } = new Dictionary<byte, List<Sprite>>();
+        public static List<byte> Collideable { get; } = new List<byte>();
 
-        public static Sprite GetTexture(TerrainType type) {
+        public static Sprite GetTexture(byte type) {
             if (!Graphics.ContainsKey(type)) return Graphics[0][0];
             return CoreGame.Instance.Random(Graphics[type]);
         }
@@ -16,13 +15,13 @@ namespace CoreModule.Terrain {
         public static void Setup() {
             string[] manifest = System.IO.File.ReadAllLines("Assets/Terrain/manifest.txt");
 
-            Graphics[TT_AIR] = new List<Sprite>() {
+            Graphics[1] = new List<Sprite>() {
             null,};
-            Graphics[TT_UNDEFINED] = new List<Sprite>();
+            Graphics[0] = new List<Sprite>();
 
             foreach (string s in manifest) {
                 string[] data = s.Split(' ');
-                TerrainType key = (TerrainType)int.Parse(data[0]);
+                byte key = (byte)int.Parse(data[0]);
                 string name;
                 for (int i = 1; i <= int.Parse(data[3]); i++) {
                     if (int.Parse(data[3]) > 1)

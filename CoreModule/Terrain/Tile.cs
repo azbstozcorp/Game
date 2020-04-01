@@ -7,18 +7,18 @@ using PixelEngine;
 
 namespace CoreModule.Terrain {
     public class Tile : Drawables.Drawable {
-        public const int TileSize = 4;
+        public const int TileSize = 5;
 
-        public TerrainType Type {
+        public byte Type {
             get => type; set {
                 type = value;
                 Sprite = TileManager.GetTexture(type);
             }
         }
-        TerrainType type;
+        byte type;
         public Sprite Sprite { get; private set; }
 
-        public Tile(TerrainType type) {
+        public Tile(byte type) {
             Sprite = TileManager.GetTexture(type);
             Type = type;
         }

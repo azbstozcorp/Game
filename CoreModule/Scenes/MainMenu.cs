@@ -20,9 +20,9 @@ namespace CoreModule.Scenes {
             Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 30));
 
             Button playButton = new Button("Play", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2);
-            playButton.ButtonPressed += PlayButton_ButtonPressed;
+            playButton.Pressed += PlayButton_ButtonPressed;
             Button quitButton = new Button("Quit", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 20);
-            quitButton.ButtonPressed += QuitButton_ButtonPressed;
+            quitButton.Pressed += QuitButton_ButtonPressed;
 
             Drawables.Add(playButton);
             Drawables.Add(new Button("Settings", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 10));
@@ -30,7 +30,7 @@ namespace CoreModule.Scenes {
         }
 
         private void PlayButton_ButtonPressed() {
-            CoreGame.Instance.PushScene(Level.LoadLevel("TestingRoom"));
+            CoreGame.Instance.PushScene(new LevelSelect());
         }
         private void QuitButton_ButtonPressed() {
             CoreGame.Instance.Finish();
