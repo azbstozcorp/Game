@@ -8,6 +8,7 @@
         TT_GRASSMID,
         TT_GRASSBOT,
         TT_FLOWER,
+        TT_STONE,
 
         TT_COUNT // Always keep last
     }

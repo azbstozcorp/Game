@@ -22,11 +22,18 @@ namespace CoreModule.Terrain {
             foreach (string s in manifest) {
                 string[] data = s.Split(' ');
                 TerrainType key = (TerrainType)int.Parse(data[0]);
-                string name = $"Assets/Terrain/{data[1]}.png";
-                bool collide = bool.Parse(data[2]);
+                string name;
+                for (int i = 0; i < int.Parse(data[3]); i++) {
+                    if (int.Parse(data[3]) > 1)
 
-                Graphics[key] = Sprite.Load(name);
-                if (collide) Collideable.Add(key);
+                        name = $"Assets/Terrain/{data[1]}_{i}.png";
+                    else
+                        name = $"Assets/Terrain/{data[1]}.png";
+                    bool collide = bool.Parse(data[2]);
+
+                    Graphics[key] = Sprite.Load(name);
+                    if (collide) Collideable.Add(key);
+                }
             }
         }
 
