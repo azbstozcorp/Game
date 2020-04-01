@@ -97,8 +97,8 @@ namespace CoreModule {
                 }
             }
 
-            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].X--;
-            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].X++;
+            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X=-1;
+            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X=+1;
             if (CoreGame.Instance.GetKey(Key.Up).Down) Entities[0].Velocity.Y = -1;
 
             if (CoreGame.Instance.GetKey(Key.E).Pressed) editing = !editing;

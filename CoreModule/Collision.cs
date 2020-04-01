@@ -54,16 +54,9 @@ namespace CoreModule {
         /// <summary>
         /// Find the intersection rect of a rect and a rect
         /// </summary>
-        //public static Rect IntersectionRect(Rect a, Rect b) {
-        //    if (a.Bottom > b.Top && a.Top < b.Top && a.Right > b.Left && b.Left < a.Left)
-        //        return new Rect(b.TopLeft, a.BottomRight);
-        //    if (a.Top < b.Bottom && a.Bottom > b.Bottom && a.Right > b.Left && b.Left < a.Left)
-        //        return new Rect(IntersectionOf(new Line(a.TopLeft, a.TopRight), new Line(b.TopLeft, b.BottomLeft)),
-        //                        IntersectionOf(new Line(a.TopRight, a.BottomRight), new Line(b.BottomLeft, b.BottomRight)));
-        //    if (a.Left < b.Right && a.Right > b.Right && a.Top < b.Top && a.Bottom < b.Bottom)
-        //        return new Rect(IntersectionOf(new Line(), new Line()),
-        //                        IntersectionOf(new Line(), new Line());
-        //}
+        public static Rect IntersectionRect(Rect a, Rect b) {
+            return new Rect(new Point(Max(a.Left, b.Left), Max(a.Top, b.Top)), new Point(Min(a.Right, b.Right), Min(a.Bottom, b.Bottom)));
+        }
 
         static int Min(int a, int b) => a > b ? b : a;
         static int Max(int a, int b) => a > b ? a : b;

@@ -24,6 +24,7 @@ namespace CoreModule.Drawables.Entities {
         }
 
         public float Gravity { get; set; } = 0.1f;
+        float _gravity = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
 
@@ -44,64 +45,95 @@ namespace CoreModule.Drawables.Entities {
             containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.BottomRight));
         }
 
-        public override void Update(float fElapsedTime) {
-            base.Update(fElapsedTime);
-
-            oldBounds = Bounds.Copy;
+        void Move() {
+            List<Rect> collidingRects = new List<Rect>();
 
             Velocity.Y += Gravity;
-            X += Velocity.X;
-            Y += Velocity.Y;
+            RectF checkRect = Bounds.Copy;
+            checkRect.Move(Velocity.X, Velocity.Y);
 
-            List<Rect> collidingRects = new List<Rect>();
-            GetContainingChunks();
-            foreach (Chunk chunk in containingChunks) {
-                if (chunk == null) continue;
-                Rect locallyPositionedBounds = Bounds.Copy;
-                locallyPositionedBounds.Left -= chunk.WorldPosition.X * Chunk.ChunkSize;
-                locallyPositionedBounds.Top -= chunk.WorldPosition.Y * Chunk.ChunkSize;
-                locallyPositionedBounds.Right -= chunk.WorldPosition.X * Chunk.ChunkSize;
-                locallyPositionedBounds.Bottom -= chunk.WorldPosition.Y * Chunk.ChunkSize;
+            void GetCollisions(RectF with) {
+                GetContainingChunks();
+                foreach (Chunk chunk in containingChunks) {
+                    if (chunk == null) continue;
+                    Rect locallyPositionedBounds = with.Copy;
+                    locallyPositionedBounds.Left -= chunk.WorldPosition.X * Chunk.ChunkSize;
+                    locallyPositionedBounds.Top -= chunk.WorldPosition.Y * Chunk.ChunkSize;
+                    locallyPositionedBounds.Right -= chunk.WorldPosition.X * Chunk.ChunkSize;
+                    locallyPositionedBounds.Bottom -= chunk.WorldPosition.Y * Chunk.ChunkSize;
 
-                foreach (Rect terrainCollider in chunk.Colliders) {
-                    if (RectsOverlap(locallyPositionedBounds, terrainCollider)) {
-                        Rect globalPositionedCollider = terrainCollider.Copy;
-                        globalPositionedCollider.Left += chunk.WorldPosition.X * Chunk.ChunkSize;
-                        globalPositionedCollider.Top += chunk.WorldPosition.Y * Chunk.ChunkSize;
-                        globalPositionedCollider.Right += chunk.WorldPosition.X * Chunk.ChunkSize;
-                        globalPositionedCollider.Bottom += chunk.WorldPosition.Y * Chunk.ChunkSize;
-                        collidingRects.Add(globalPositionedCollider);
+                    foreach (Rect terrainCollider in chunk.Colliders) {
+                        if (RectsOverlap(locallyPositionedBounds, terrainCollider)) {
+                            Rect globalPositionedCollider = terrainCollider.Copy;
+                            globalPositionedCollider.Left += chunk.WorldPosition.X * Chunk.ChunkSize;
+                            globalPositionedCollider.Top += chunk.WorldPosition.Y * Chunk.ChunkSize;
+                            globalPositionedCollider.Right += chunk.WorldPosition.X * Chunk.ChunkSize;
+                            globalPositionedCollider.Bottom += chunk.WorldPosition.Y * Chunk.ChunkSize;
+                            collidingRects.Add(globalPositionedCollider);
+                        }
                     }
                 }
             }
 
-            foreach (Rect collider in collidingRects) {
-                PointF change = Bounds.Center - oldBounds.Center;
+            bool up = false, down = false, left = false, right = false;
 
-                float margin = 4f;
-
-                Rect left = new Rect(new PointF(Bounds.Left - 1, Bounds.Top + margin), new PointF(Bounds.Left, Bounds.Bottom - margin));
-                Rect right = new Rect(new PointF(Bounds.Right, Bounds.Top + margin), new PointF(Bounds.Right + 1, Bounds.Bottom - margin));
-                Rect up = new Rect(new PointF(Bounds.Left + margin, Y - 1), new PointF(Bounds.Right - margin, Y));
-                Rect down = new Rect(new PointF(Bounds.Left + margin, Bounds.Center.Y), new PointF(Bounds.Right - margin, Bounds.Bottom + 1));
-
-                if (RectsOverlap(left, collider)) {
-                    X = collider.Right;
-                    Velocity.X = 0;
+            if (Velocity.Y != 0) {
+                RectF vertical = new RectF();
+                if (Velocity.Y < 0) {
+                    vertical = new RectF(Bounds.Left, Bounds.Top + Velocity.Y, Bounds.Right, Bounds.Top);
+                    up = true;
                 }
-                if (RectsOverlap(right, collider)) {
-                    X = collider.Left - Bounds.Width;
-                    Velocity.X = 0;
+                else {
+                    vertical = new RectF(Bounds.Left, Bounds.Bottom, Bounds.Right, Bounds.Bottom + Velocity.Y);
+                    down = true;
                 }
-                if (RectsOverlap(up, collider)) {
-                    Y = collider.Bottom;
-                    Velocity.Y = 0;
-                }
-                if (RectsOverlap(down, collider)) {
-                    Y = collider.Top - Bounds.Height;
+                GetCollisions(vertical);
+                CoreGame.Instance.DrawRect(vertical.TopLeft, vertical.BottomRight, PixelEngine.Pixel.Presets.White);
+                foreach (Rect collision in collidingRects) {
+                    Rect overlap = IntersectionRect(vertical, collision);
+                    if (down) {
+                        checkRect.Move(0, -overlap.Height);
+                    }
+                    if (up) {
+                        checkRect.Move(0, overlap.Height);
+                    }
                     Velocity.Y = 0;
                 }
             }
+
+            collidingRects.Clear();
+            if (Velocity.X != 0) {
+                RectF horizontal = new RectF();
+                if (Velocity.X < 0) {
+                    horizontal = new RectF(Bounds.Left + Velocity.X, Bounds.Top, Bounds.Left, Bounds.Bottom);
+                    left = true;
+                }
+                else {
+                    horizontal = new RectF(Bounds.Right, Bounds.Top, Bounds.Right + Velocity.X, Bounds.Bottom);
+                    right = true;
+                }
+                GetCollisions(horizontal);
+                CoreGame.Instance.DrawRect(horizontal.TopLeft, horizontal.BottomRight, PixelEngine.Pixel.Presets.White);
+                foreach (Rect collision in collidingRects) {
+                    Rect overlap = IntersectionRect(horizontal, collision);
+                    if (left) {
+                        checkRect.Move(overlap.Width, 0);
+                    }
+                    if (right) {
+                        checkRect.Move(-overlap.Width, 0);
+                    }
+                    Velocity.X = 0;
+                }
+            }
+
+            Velocity.X = 0;
+            Bounds = checkRect;
+        }
+
+        public override void Update(float fElapsedTime) {
+            base.Update(fElapsedTime);
+
+            Move();
         }
 
         public override void Draw() {

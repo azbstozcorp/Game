@@ -75,10 +75,10 @@
             Bottom = bottomRight.Y;
             Right = bottomRight.X;
         }
-        public RectF(PointF topLeft, int width, int height) : this(topLeft, (topLeft.X + width, topLeft.Y + height)) { }
-        public RectF(int x1, int y1, int x2, int y2) : this((x1, y1), (x2, y2)) { }
+        public RectF(PointF topLeft, float width, float height) : this(topLeft, (topLeft.X + width, topLeft.Y + height)) { }
+        public RectF(float x1, float y1, float x2, float y2) : this((x1, y1), (x2, y2)) { }
 
-        public void Move(int amountX, int amountY) { Left += amountX; Right += amountX; Top += amountY; Bottom += amountY; }
+        public void Move(float amountX, float amountY) { Left += amountX; Right += amountX; Top += amountY; Bottom += amountY; }
 
         public RectF Copy => new RectF(TopLeft, BottomRight);
 
