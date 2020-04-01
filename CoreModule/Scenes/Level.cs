@@ -24,6 +24,7 @@ namespace CoreModule.Scenes {
         int tileIndex = 2;
 
         bool editing = false;
+        List<Button> editorButtons = new List<Button>();
 
         public Level() {
             Console.WriteLine($"Initializing World...");
@@ -31,14 +32,24 @@ namespace CoreModule.Scenes {
             CameraLocation = new Point();
             TileManager.Setup();
             Entities.Add(new PhysicsEntity(10, 10, 10, 20, null));
+
+            Button swapLevel = new Button("Load", CoreGame.Instance.ScreenWidth - 20, 40);
+            swapLevel.ButtonPressed += SwapLevel_ButtonPressed;
+            editorButtons.Add(swapLevel);
         }
+
+        private void SwapLevel_ButtonPressed() {
+            CoreGame.Instance.PopScene();
+            CoreGame.Instance.PushScene(LoadLevel("Newtest"));
+        }
+
         public Level(string name) : this() {
             Console.WriteLine($"Constructing new world with name {name}...");
             Name = name;
 
-            chunks = new Chunk[10, 10];
+            chunks = new Chunk[5, 3];
 
-            for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     chunks[i, j] = new Chunk((i * Chunk.ChunkSize, j * Chunk.ChunkSize));
                     chunks[i, j].WorldPosition.X = i;
                     chunks[i, j].WorldPosition.Y = j;
@@ -95,22 +106,17 @@ namespace CoreModule.Scenes {
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
                     chunks[chunkMouseX, chunkMouseY].SetTile(new Tile((TerrainType)tileIndex), tileMouseX, tileMouseY);
                 }
-            }
+                foreach (Button b in editorButtons) b.Update(fElapsedTime);
 
-            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X = -1;
-            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X = +1;
-            if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
-
-            if (!editing) {
-                CameraLocation.X = -(int)Entities[0].X + CoreGame.Instance.ScreenWidth / 2 + Entities[0].Bounds.Width / 2;
-                CameraLocation.Y = -(int)Entities[0].Y + CoreGame.Instance.ScreenHeight / 2 + Entities[0].Bounds.Height / 2;
-            }
-            else {
                 if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
                 if (CoreGame.Instance.GetKey(Key.S).Down) CameraLocation.Y--;
                 if (CoreGame.Instance.GetKey(Key.A).Down) CameraLocation.X++;
                 if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
             }
+
+            if (CoreGame.Instance.GetKey(Key.Left).Down) Entities[0].Velocity.X = -1;
+            if (CoreGame.Instance.GetKey(Key.Right).Down) Entities[0].Velocity.X = +1;
+            if (CoreGame.Instance.GetKey(Key.Up).Pressed) Entities[0].Velocity.Y = -1.5f;
 
             if (CoreGame.Instance.GetKey(Key.E).Pressed) editing = !editing;
 
@@ -120,13 +126,15 @@ namespace CoreModule.Scenes {
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
 
-            for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     chunks[i, j].Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
 
             if (editing) {
+                CoreGame.Instance.DrawRect(new Point(0, 0) + CameraLocation, new Point(Chunk.ChunkSize * chunks.GetLength(0), Chunk.ChunkSize * chunks.GetLength(1)) + CameraLocation, Pixel.Presets.Black);
                 CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+                foreach (Button b in editorButtons) b.Draw();
             }
         }
 
