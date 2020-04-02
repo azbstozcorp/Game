@@ -1,67 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using CoreModule.Shapes;
 
 namespace CoreModule.Drawables {
-    public class Button : Drawable {
-        public delegate void ButtonPressedEventHandler();
-        public event ButtonPressedEventHandler Pressed;
-
-        public string Text { get; set; }
-        public bool IsPressed { get; private set; }
-
-        public Button(string text, int centerX, int centerY) {
-            Text = text;
-
-            Bounds = new Rect(new Point(centerX - text.Length * 8 / 2, centerY - 8 / 2), text.Length * 8, 8);
-        }
-
-        public void Press() => Pressed?.Invoke();
-
-        public override void Update(float fElapsedTime) {
-            base.Update(fElapsedTime);
-
-            IsPressed = false;
-            if (Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true)) {
-                if (CoreGame.Instance.GetMouse(PixelEngine.Mouse.Any).Pressed) Pressed?.Invoke();
-                IsPressed = true;
-            }
-        }
-
-        public override void Draw() {
-            base.Draw();
-
-            CoreGame.Instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);
-            if (Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true))
-                CoreGame.Instance.DrawRect(Bounds.TopLeft - 1, Bounds.BottomRight + 1, CoreGame.Instance.Random(PixelEngine.Pixel.PresetPixels));
-        }
-    }
 
     public class TextBox : Button {
         public delegate void TextChangedEventHandler(string newText);
         public event TextChangedEventHandler TextChanged;
 
-        bool selected = false;
-        int location = 0;
+        public bool Selected { get; set; } = false;
+        protected int location = 0;
 
         public TextBox(string text, int centerX, int centerY, bool startAtEnd = true) : base(text, centerX, centerY) {
-            Pressed += () => selected = true;
+            Pressed += (Button pressed) => Selected = true;
             if (startAtEnd) location = text.Length;
         }
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
-            if (selected &&
+            if (Selected &&
                !Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true) &&
-               CoreGame.Instance.GetMouse(PixelEngine.Mouse.Left).Down) selected = false;
+               CoreGame.Instance.GetMouse(PixelEngine.Mouse.Left).Down) Selected = false;
 
-            if (selected) {
-                StringBuilder text = new StringBuilder(Text);
+            StringBuilder text = new StringBuilder(Text);
+            if (Selected) {
 
                 if (CoreGame.Instance.GetKey(PixelEngine.Key.Left).Pressed) {
                     if (CoreGame.Instance.GetKey(PixelEngine.Key.Control).Down) {
@@ -129,21 +92,21 @@ namespace CoreModule.Drawables {
                     if (CoreGame.Instance.GetKey(PixelEngine.Key.Space).Pressed) { text.Insert(location, ' '); location++; }
                 }
 
-                int oldWidth = (Text.Length == 0 ? 1 : Text.Length) * 8;
-                int newWidth = (text.Length == 0 ? 1 : text.Length) * 8;
-                Bounds.Left = (Bounds.Left + oldWidth / 2) - newWidth / 2;
-                Bounds.Right = Bounds.Left + newWidth;
-                Text = text.ToString();
 
-                if (oldWidth != newWidth) TextChanged?.Invoke(Text);
             }
+            int oldWidth = (Text.Length == 0 ? 1 : Text.Length) * 8;
+            int newWidth = (text.Length == 0 ? 1 : text.Length) * 8;
+            Bounds.Left = (Bounds.Left + oldWidth / 2) - newWidth / 2;
+            Bounds.Right = Bounds.Left + newWidth;
+            Text = text.ToString();
+            if (oldWidth != newWidth) TextChanged?.Invoke(Text);
         }
 
         public override void Draw() {
             base.Draw();
 
             CoreGame.Instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);
-            if (selected) {
+            if (Selected) {
                 CoreGame.Instance.DrawRect(Bounds.TopLeft - 1, Bounds.BottomRight + 1, CoreGame.Instance.Random(PixelEngine.Pixel.PresetPixels));
                 CoreGame.Instance.DrawLine(Bounds.TopLeft + new Point(location * 8, 0),
                                            Bounds.BottomLeft + new Point(location * 8, -1),

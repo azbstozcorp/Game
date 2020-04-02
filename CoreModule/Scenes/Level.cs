@@ -18,7 +18,7 @@ namespace CoreModule.Scenes {
         public static Level Instance { get; private set; }
 
         public List<PhysicsEntity> Entities { get; } = new List<PhysicsEntity>();
-        public PhysicsEntity Player { get; } = new PhysicsEntity(10, 100, 10, 20, null);
+        public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
         public string Name { get; private set; } = "";
         public Point CameraLocation;
         public Chunk[,] chunks;
@@ -35,7 +35,8 @@ namespace CoreModule.Scenes {
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
-            Entities.Add(Player);
+            Entities.Add(TestPlayer);
+            TestPlayer.DrawDebug = true;
 
             Button editorButtonSave = new Button("Save",
                 CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1,
@@ -86,6 +87,16 @@ namespace CoreModule.Scenes {
         public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) => GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
         #endregion Chunk Utilities
 
+        public void RefreshTextures() {
+            for (int i = 0; i < chunks.GetLength(0); i++)
+                for (int j = 0; j < chunks.GetLength(1); j++) {
+                    GetChunk(i, j).GenerateColliders();
+                    for (int x = 0; x < Chunk.NumTiles; x++)
+                        for (int y = 0; y < Chunk.NumTiles; y++)
+                            GetChunk(i, j).GetTile(x, y).Type = GetChunk(i, j).GetTile(x, y).Type;
+                }
+        }
+
         void Exit() {
             CoreGame.Instance.PushScene(new ExitConfirmDialogue());
         }
@@ -93,6 +104,7 @@ namespace CoreModule.Scenes {
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
+            if (CoreGame.Instance.GetKey(Key.T).Pressed) CoreGame.Instance.PushScene(new TileEditor());
 
             if (Editing) {
                 int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
@@ -106,8 +118,8 @@ namespace CoreModule.Scenes {
                 if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
 
                 tileIndex += (int)CoreGame.Instance.MouseScroll;
-                if (tileIndex == 0) tileIndex = TileManager.Graphics.Keys.Count - 1;
-                if (tileIndex == TileManager.Graphics.Keys.Count) tileIndex = 1;
+                if (tileIndex == 0) tileIndex = TileManager.MaxValue;
+                if (tileIndex > TileManager.MaxValue) tileIndex = 1;
 
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
                     GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);
@@ -119,18 +131,18 @@ namespace CoreModule.Scenes {
                 int vel = 0;
                 if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
                 if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
-                Entities[0].Velocity.X = vel;
+                TestPlayer.Velocity.X = vel;
                 if (CoreGame.Instance.GetKey(Key.W).Pressed) Entities[0].Velocity.Y = -1.5f;
 
                 int cameraRatio = 1;
                 int newX = -(int)Entities[0].X +
                             CoreGame.Instance.ScreenWidth / 2 +
-                            Entities[0].Bounds.Width / 2 -
+                            TestPlayer.Bounds.Width / 2 -
                             CoreGame.Instance.MouseX / cameraRatio +
                             CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
                 int newY = -(int)Entities[0].Y +
                             CoreGame.Instance.ScreenHeight / 2 +
-                            Entities[0].Bounds.Height / 2 -
+                            TestPlayer.Bounds.Height / 2 -
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
 
@@ -152,13 +164,31 @@ namespace CoreModule.Scenes {
 
             if (Editing) {
                 foreach (Button b in editorButtons) b.Draw();
-                CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+                //CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
+                Sprite currentTileSprite = TileManager.GetTexture((byte)tileIndex);
+                if (currentTileSprite != null) {
+                    Sprite previewTexture = new Sprite(Tile.TileSize, Tile.TileSize);
+                    Sprite.Copy(currentTileSprite, previewTexture);
+                    for (int x = 0; x < previewTexture.Width; x++) {
+                        for (int y = 0; y < previewTexture.Height; y++) {
+                            Pixel current = previewTexture[x, y];
+                            previewTexture[x, y] = new Pixel(current.R, current.G, current.B, 100);
+                        }
+                    }
+
+                    int tileLocX = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseX / Tile.TileSize)) * Tile.TileSize;
+                    int tileLocY = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseY / Tile.TileSize)) * Tile.TileSize;
+
+                    PixelEngine.Extensions.Transforms.Transform transform = new PixelEngine.Extensions.Transforms.Transform();
+                    transform.Translate(tileLocX, tileLocY);
+                    PixelEngine.Extensions.Transforms.Transform.DrawSprite(previewTexture, transform);
+                }
             }
         }
 
         #region Editor Buttons
-        private void EditorButtonSave_Pressed() => SaveLevel();
-        private void EditorButtonTileDialog_Pressed() {
+        private void EditorButtonSave_Pressed(Button pressed) => SaveLevel();
+        private void EditorButtonTileDialog_Pressed(Button pressed) {
             throw new NotImplementedException();
         }
         #endregion Editor Buttons
@@ -237,18 +267,18 @@ namespace CoreModule.Scenes {
                 cancel.Pressed += Cancel_Pressed;
             }
 
-            private void Yes_Pressed() {
+            private void Yes_Pressed(Button pressed) {
                 Instance.SaveLevel();
                 CoreGame.Instance.PopScene();
                 CoreGame.Instance.PopScene();
             }
 
-            private void No_Pressed() {
+            private void No_Pressed(Button pressed) {
                 CoreGame.Instance.PopScene();
                 CoreGame.Instance.PopScene();
             }
 
-            private void Cancel_Pressed() {
+            private void Cancel_Pressed(Button pressed) {
                 CoreGame.Instance.PopScene();
                 Instance.Editing = true;
             }

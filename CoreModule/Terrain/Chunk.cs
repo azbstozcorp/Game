@@ -39,9 +39,10 @@ namespace CoreModule.Terrain {
 
         public override void Draw() {
             base.Draw();
+            Pixel lines = new Pixel(255, 255, 255, 40);
+
             Point topLeft = new Point(Level.Instance.CameraLocation.X + Bounds.Left, Level.Instance.CameraLocation.Y + Bounds.Top);
             Point bottomRight = new Point(Level.Instance.CameraLocation.X + Bounds.Right, Level.Instance.CameraLocation.Y + Bounds.Bottom);
-            //CoreGame.Instance.DrawRect(topLeft, bottomRight, Pixel.Presets.White);
 
             if (Empty)
                 return; // If there are no tiles in the chunk, don't draw
@@ -64,7 +65,8 @@ namespace CoreModule.Terrain {
 
             if (Level.Instance.Editing)
                 foreach (Rect collider in Colliders) {
-                    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, Pixel.Presets.White);
+                    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, lines);
+                    CoreGame.Instance.DrawRect(topLeft, bottomRight, lines);
                 }
         }
 
@@ -83,7 +85,7 @@ namespace CoreModule.Terrain {
             return Tiles[x, y];
         }
 
-        void GenerateColliders() {
+        public void GenerateColliders() {
             Colliders.Clear();
 
             for (int x = 0; x < NumTiles; x++) {

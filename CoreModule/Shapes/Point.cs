@@ -13,7 +13,7 @@ namespace CoreModule.Shapes {
         public Point(PixelEngine.Point from) { X = from.X; Y = from.Y; }
         public Point((int x, int y) from) { X = from.x; Y = from.y; }
 
-        public static bool operator ==(Point a, Point b) => a.Equals(b);
+        public static bool operator ==(Point a, Point b) => a != null && b != null && a.X == b.X && a.Y == b.Y;
         public static bool operator !=(Point a, Point b) => !(a == b);
 
         public static implicit operator Point(PixelEngine.Point p) => new Point(p);
