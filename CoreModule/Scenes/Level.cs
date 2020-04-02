@@ -87,6 +87,16 @@ namespace CoreModule.Scenes {
         public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) => GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
         #endregion Chunk Utilities
 
+        public void RefreshTextures() {
+            for (int i = 0; i < chunks.GetLength(0); i++)
+                for (int j = 0; j < chunks.GetLength(1); j++) {
+                    GetChunk(i, j).GenerateColliders();
+                    for (int x = 0; x < Chunk.NumTiles; x++)
+                        for (int y = 0; y < Chunk.NumTiles; y++)
+                            GetChunk(i, j).GetTile(x, y).Type = GetChunk(i, j).GetTile(x, y).Type;
+                }
+        }
+
         void Exit() {
             CoreGame.Instance.PushScene(new ExitConfirmDialogue());
         }
@@ -94,6 +104,7 @@ namespace CoreModule.Scenes {
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
+            if (CoreGame.Instance.GetKey(Key.T).Pressed) CoreGame.Instance.PushScene(new TileEditor());
 
             if (Editing) {
                 int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
@@ -107,8 +118,8 @@ namespace CoreModule.Scenes {
                 if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
 
                 tileIndex += (int)CoreGame.Instance.MouseScroll;
-                if (tileIndex == 0) tileIndex = TileManager.Graphics.Keys.Count - 1;
-                if (tileIndex == TileManager.Graphics.Keys.Count) tileIndex = 1;
+                if (tileIndex == 0) tileIndex = TileManager.MaxValue;
+                if (tileIndex > TileManager.MaxValue) tileIndex = 1;
 
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
                     GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);

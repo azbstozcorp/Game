@@ -23,7 +23,7 @@ namespace CoreModule.Scenes {
         int scale;
         Sprite sprite;
 
-        //Dictionary<>
+        Dictionary<string, Button> existing = new Dictionary<string, Button>();
 
         public TileEditor() {
             sprite = new Sprite(Tile.TileSize, Tile.TileSize);
@@ -60,7 +60,20 @@ namespace CoreModule.Scenes {
             TileManager.IDs.Clear();
 
             TileManager.Setup();
-        } 
+
+            existing.Clear();
+            foreach (byte b in TileManager.IDs.Values) {
+                string name = TileManager.GetName(b);
+                existing[name] = new Button(name, 350, b * 10 + 5);
+                existing[name].Pressed += ExistingClicked;
+            }
+        }
+
+        private void ExistingClicked(Button sender) {
+            name.Text = sender.Text;
+            LoadTile(name);
+        }
+
         private void LoadTile(Button sender) {
             RefreshTileManager();
             byte id = TileManager.GetTypeFromName(this.name.Text);
@@ -77,6 +90,8 @@ namespace CoreModule.Scenes {
             Sprite.Save(sprite, $"Assets/Terrain/{name.Text}.png");
             TileManager.AddToManifest((byte)id.Value, name.Text, collide.On);
             TileManager.SaveManifest();
+
+            Level.Instance?.RefreshTextures();
             RefreshTileManager();
         }
 
@@ -93,7 +108,9 @@ namespace CoreModule.Scenes {
             }
 
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) CoreGame.Instance.PopScene();
-        } 
+
+            foreach (Button b in existing.Values.ToArray()) b.Update(fElapsedTime);
+        }
 
         public override void Draw() {
             base.Draw();
@@ -106,13 +123,15 @@ namespace CoreModule.Scenes {
 
             if (Collision.WithinRect(editingArea, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY))) {
                 int editX = (CoreGame.Instance.MouseX) / scale;
-                int editY = (CoreGame.Instance.MouseY) / scale;
+                int editY = (CoreGame.Instance.MouseY) / scale; 
 
                 CoreGame.Instance.FillRect(new Point(editX * scale, editY * scale), scale, scale, picker.Value);
             }
-
+            
             CoreGame.Instance.DrawSprite(new Point(0, 0), sprite);
             CoreGame.Instance.DrawRect(editingArea.TopLeft, editingArea.BottomRight, Pixel.Presets.White);
+
+            foreach (Button b in existing.Values.ToArray()) b.Draw();
         }
     }
 }

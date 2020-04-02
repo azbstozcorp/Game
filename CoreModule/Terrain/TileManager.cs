@@ -8,6 +8,7 @@ namespace CoreModule.Terrain {
         public static Dictionary<byte, string> Names { get; } = new Dictionary<byte, string>();
         public static Dictionary<string, byte> IDs { get; } = new Dictionary<string, byte>();
         public static HashSet<byte> Collideable { get; } = new HashSet<byte>();
+        public static byte MaxValue = 0;
 
         public static Sprite GetTexture(byte type) {
             if (type == 1) return null;
@@ -29,6 +30,8 @@ namespace CoreModule.Terrain {
 
         public static void AddToManifest(byte type, string name, bool collide) {
             string path = $"Assets/Terrain/{name}.png";
+
+            if (type > MaxValue) MaxValue = type;
 
             Graphics[type] = Sprite.Load(path);
             Names[type] = name;

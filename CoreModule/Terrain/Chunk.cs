@@ -85,7 +85,7 @@ namespace CoreModule.Terrain {
             return Tiles[x, y];
         }
 
-        void GenerateColliders() {
+        public void GenerateColliders() {
             Colliders.Clear();
 
             for (int x = 0; x < NumTiles; x++) {

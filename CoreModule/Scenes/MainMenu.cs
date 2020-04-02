@@ -35,7 +35,7 @@ namespace CoreModule.Scenes {
             CoreGame.Instance.PushScene(new LevelSelect());
         }
         private void SettingsButton_Pressed(Button sender) {
-            CoreGame.Instance.PushScene(new TileEditor());
+            //CoreGame.Instance.PushScene(new TileEditor());
         }
         private void QuitButton_ButtonPressed(Button sender) {
             CoreGame.Instance.Finish();
