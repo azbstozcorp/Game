@@ -1,7 +1,7 @@
-0 missing false 1
-2 ground true 2
-3 grasstop true 1
-4 grassmid true 1
-5 grassbottom true 1
-6 flower false 1
-7 stone true 3
+0 missing False
+2 ground True
+3 grasstop True
+4 grassmid True
+5 grassbottom True
+6 flower False
+7 stone True

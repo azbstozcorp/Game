@@ -23,8 +23,8 @@ namespace CoreModule.Drawables {
                !Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true) &&
                CoreGame.Instance.GetMouse(PixelEngine.Mouse.Left).Down) Selected = false;
 
+            StringBuilder text = new StringBuilder(Text);
             if (Selected) {
-                StringBuilder text = new StringBuilder(Text);
 
                 if (CoreGame.Instance.GetKey(PixelEngine.Key.Left).Pressed) {
                     if (CoreGame.Instance.GetKey(PixelEngine.Key.Control).Down) {
@@ -92,14 +92,14 @@ namespace CoreModule.Drawables {
                     if (CoreGame.Instance.GetKey(PixelEngine.Key.Space).Pressed) { text.Insert(location, ' '); location++; }
                 }
 
-                int oldWidth = (Text.Length == 0 ? 1 : Text.Length) * 8;
-                int newWidth = (text.Length == 0 ? 1 : text.Length) * 8;
-                Bounds.Left = (Bounds.Left + oldWidth / 2) - newWidth / 2;
-                Bounds.Right = Bounds.Left + newWidth;
-                Text = text.ToString();
 
-                if (oldWidth != newWidth) TextChanged?.Invoke(Text);
             }
+            int oldWidth = (Text.Length == 0 ? 1 : Text.Length) * 8;
+            int newWidth = (text.Length == 0 ? 1 : text.Length) * 8;
+            Bounds.Left = (Bounds.Left + oldWidth / 2) - newWidth / 2;
+            Bounds.Right = Bounds.Left + newWidth;
+            Text = text.ToString();
+            if (oldWidth != newWidth) TextChanged?.Invoke(Text);
         }
 
         public override void Draw() {

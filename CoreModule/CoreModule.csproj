@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="*.cs" />
     <Compile Include="Drawables\Button.cs" />
+    <Compile Include="Drawables\CheckBox.cs" />
     <Compile Include="Drawables\ColourPicker.cs" />
     <Compile Include="Drawables\Drawable.cs" />
     <Compile Include="Drawables\NumberBox.cs" />
