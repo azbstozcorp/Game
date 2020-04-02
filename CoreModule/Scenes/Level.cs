@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 using PixelEngine;
 using CoreModule.Drawables;
+using CoreModule.Entities;
 using CoreModule.Shapes;
 using CoreModule.Saving;
 using CoreModule.Terrain;
-using CoreModule.Drawables.Entities;
 
 using Point = CoreModule.Shapes.Point;
 

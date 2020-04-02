@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using CoreModule.Shapes;
 using CoreModule.Terrain;
 using CoreModule.Scenes;
+using CoreModule.Drawables;
 using static CoreModule.Collision;
 
-namespace CoreModule.Drawables.Entities {
+namespace CoreModule.Entities {
     public class PhysicsEntity : Drawable {
         public float X {
             get => Bounds.Left; set {

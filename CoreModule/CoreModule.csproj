@@ -67,7 +67,7 @@
     <Compile Include="Terrain\Chunk.cs" />
     <Compile Include="Terrain\Tile.cs" />
     <Compile Include="Terrain\TileManager.cs" />
-    <Compile Include="Drawables\Entities\PhysicsEntity.cs" />
+    <Compile Include="Entities\PhysicsEntity.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
