@@ -18,6 +18,7 @@ namespace CoreModule.Scenes {
         public static Level Instance { get; private set; }
 
         public List<Entity> Entities { get; } = new List<Entity>();
+        public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
         public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
         public string Name { get; private set; } = "";
         public Point CameraLocation;
@@ -106,6 +107,8 @@ namespace CoreModule.Scenes {
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
             if (CoreGame.Instance.GetKey(Key.T).Pressed) CoreGame.Instance.PushScene(new TileEditor());
 
+            //if (LevelTriggers.Count == 0) LevelTriggers.Add(new LevelTrigger(new PointF(40, 40), new PointF(80, 80)) { Name = "Test" });
+
             if (Editing) {
                 int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
                 int chunkMouseY = (CoreGame.Instance.MouseY - CameraLocation.Y) / Chunk.ChunkSize;
@@ -151,6 +154,7 @@ namespace CoreModule.Scenes {
                 CameraLocation.Y = (int)newY;
 
                 foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
+                foreach (LevelTrigger t in LevelTriggers) t.Update(fElapsedTime);
             }
 
             if (CoreGame.Instance.GetKey(Key.E).Pressed) Editing = !Editing;
@@ -162,6 +166,7 @@ namespace CoreModule.Scenes {
                     GetChunk(i, j).Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
+            foreach (LevelTrigger t in LevelTriggers) t.Draw();
 
             if (Editing) {
                 foreach (Button b in editorButtons) b.Draw();
@@ -225,6 +230,17 @@ namespace CoreModule.Scenes {
             data.Add(chunkWidthY);
             foreach (byte[] chunkBytes in chunkData)
                 data.AddRange(chunkBytes);
+
+            List<byte> triggerData = new List<byte>();
+            foreach (LevelTrigger trigger in LevelTriggers) {
+                byte[] tData = trigger.GetSaveData();
+                int tDataLength = tData.Length;
+                triggerData.AddRange(BitConverter.GetBytes(tDataLength));
+                triggerData.AddRange(tData);
+            }
+            data.AddRange(BitConverter.GetBytes(LevelTriggers.Count));
+            data.AddRange(triggerData);
+
             return data.ToArray();
         }
         public void LoadSaveData(byte[] data) {
@@ -232,6 +248,7 @@ namespace CoreModule.Scenes {
 
             byte nameLength = data[location]; /*                             */ location++;
             string name = Encoding.ASCII.GetString(data, location, nameLength); location += nameLength;
+            Name = name;
 
             byte chunkWidthX = data[location]; /*                            */ location++;
             byte chunkWidthY = data[location]; /*                            */ location++;
@@ -247,8 +264,16 @@ namespace CoreModule.Scenes {
                     location += chunkByteSize;
                 }
             }
+            if (location == data.Length) return;
 
-            Name = name;
+            int numTriggers = BitConverter.ToInt32(data, location); location += sizeof(int); 
+            for (int i = 0; i < numTriggers; i++) {
+                int triggerLength = BitConverter.ToInt32(data, location); location += sizeof(int);
+                LevelTrigger t = new LevelTrigger();
+                t.LoadSaveData(data.Skip(location).Take(triggerLength).ToArray());
+                LevelTriggers.Add(t);
+                location += triggerLength;
+            }
         }
 
         class ExitConfirmDialogue : Scene {
