@@ -20,17 +20,25 @@ namespace CoreModule.Drawables {
             _origCenterX = centerX;
             _origCenterY = centerY;
 
+            Pressed += NumberBox_Pressed;
             TextChanged += NumberBox_TextChanged;
         }
 
+        private void NumberBox_Pressed(Button sender) {
+            location = Text.Length;
+        }
+
         private void NumberBox_TextChanged(string newText) {
-            if (Text.Length <= 0) { Value = Min; return; }
+            if (newText.Length <= 0) {
+                Value = Min;
+                Text = Value.ToString();
+                location = Text.Length;
+            }
+            else
             if (int.TryParse(newText, out int result)) {
-                if (result < Min) Value = Min;
-                else if (result > Max) Value = Max;
-                Value = result;
-            } 
-            else {
+                if (result <= Min) Value = Min;
+                else if (result >= Max) Value = Max;
+                else Value = result;
                 Text = Value.ToString();
                 location = Text.Length;
             }

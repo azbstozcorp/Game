@@ -23,7 +23,7 @@ namespace CoreModule.Scenes {
         int scale;
         Sprite sprite;
 
-        Dictionary<string, Button> existing = new Dictionary<string, Button>();
+        Dictionary<string, ExistingButton> existing = new Dictionary<string, ExistingButton>();
 
         public TileEditor() {
             sprite = new Sprite(Tile.TileSize, Tile.TileSize);
@@ -63,14 +63,18 @@ namespace CoreModule.Scenes {
             existing.Clear();
             foreach (byte b in TileManager.IDs.Values) {
                 string name = TileManager.GetName(b);
-                existing[name] = new Button(name, 250, b * 10 + 5);
+                string displayName = "";
+                if (name.Length > 10) displayName = $"{new string(name.Take(7).ToArray())}...";
+                if (name.Length < 10) displayName = name.PadRight(10);
+                existing[name] = new ExistingButton(displayName, name, 250, b * 10 + 5, TileManager.GetTexture(b));
                 existing[name].Pressed += ExistingClicked;
             }
         }
-
         private void ExistingClicked(Button sender) {
-            name.Text = sender.Text;
-            LoadTile(name);
+            if (sender is ExistingButton b) {
+                name.Text = b.tileName;
+                LoadTile(name);
+            }
         }
 
         private void LoadTile(Button sender) {
@@ -92,8 +96,8 @@ namespace CoreModule.Scenes {
             for (int x = 0; x < sprite.Width; x++) for (int y = 0; y < sprite.Height; y++) sprite[x, y] = load[x, y];
 
             //scale = 200 / sprite.Width;
-            //editingArea = new Rect(new Point(0, 0), scale * sprite.Width, scale * sprite.Height);
-
+            scale = 100 / sprite.Width;
+            editingArea = new Rect(new Point(0, 0), scale * sprite.Width, scale * sprite.Height);
         }
         private void SaveTile(Button sender) {
             Sprite.Save(sprite, $"Assets/Terrain/{name.Text}.png");
@@ -118,7 +122,7 @@ namespace CoreModule.Scenes {
 
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) CoreGame.Instance.PopScene();
 
-            foreach (Button b in existing.Values.ToArray()) b.Update(fElapsedTime);
+            foreach (ExistingButton b in existing.Values.ToArray()) b.Update(fElapsedTime);
         }
         public override void Draw() {
             base.Draw();
@@ -139,7 +143,14 @@ namespace CoreModule.Scenes {
             CoreGame.Instance.DrawSprite(new Point(0, 0), sprite);
             CoreGame.Instance.DrawRect(editingArea.TopLeft, editingArea.BottomRight, Pixel.Presets.White);
 
-            foreach (Button b in existing.Values.ToArray()) b.Draw();
+            foreach (ExistingButton b in existing.Values.ToArray()) b.Draw();
+        }
+
+        class ExistingButton : ImageButton {
+            public string tileName;
+            public ExistingButton(string display, string actualName, int centerX, int centerY, Sprite spr) : base(display, centerX, centerY, spr) {
+                tileName = actualName;
+            }
         }
     }
 }

@@ -98,8 +98,9 @@ namespace CoreModule.Drawables {
             int newWidth = (text.Length == 0 ? 1 : text.Length) * 8;
             Bounds.Left = (Bounds.Left + oldWidth / 2) - newWidth / 2;
             Bounds.Right = Bounds.Left + newWidth;
+            /*if (oldWidth != newWidth)*/
+            if (text.ToString() != Text) TextChanged?.Invoke(text.ToString());
             Text = text.ToString();
-            if (oldWidth != newWidth) TextChanged?.Invoke(Text);
         }
 
         public override void Draw() {

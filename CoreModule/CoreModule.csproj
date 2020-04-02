@@ -51,6 +51,7 @@
     <Compile Include="Drawables\CheckBox.cs" />
     <Compile Include="Drawables\ColourPicker.cs" />
     <Compile Include="Drawables\Drawable.cs" />
+    <Compile Include="Drawables\ImageButton.cs" />
     <Compile Include="Drawables\NumberBox.cs" />
     <Compile Include="Drawables\TextBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
