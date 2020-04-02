@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CoreModule.Shapes;
 
 namespace CoreModule.Drawables {
-    [Serializable]
     public abstract class Drawable {
         public static bool MouseOver { get; private set; }
 

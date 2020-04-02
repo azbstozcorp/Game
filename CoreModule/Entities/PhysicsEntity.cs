@@ -11,31 +11,17 @@ using CoreModule.Drawables;
 using static CoreModule.Collision;
 
 namespace CoreModule.Entities {
-    public class PhysicsEntity : Drawable {
-        public float X {
-            get => Bounds.Left; set {
-                Bounds.Right = value + Bounds.Width;
-                Bounds.Left = value;
-            }
-        }
-        public float Y {
-            get => Bounds.Top; set {
-                Bounds.Bottom = value + Bounds.Height;
-                Bounds.Top = value;
-            }
-        }
-
+    public class PhysicsEntity : Entity {
         public bool DrawDebug { get; set; } = false;
         public float Gravity { get; set; } = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
 
         HashSet<Chunk> containingChunks = new HashSet<Chunk>();
-        new RectF Bounds;
         RectF oldBounds;
 
         public PhysicsEntity(int x, int y, int width, int height, PixelEngine.Sprite sprite) {
-            Bounds = new Rect(new Point(x, y), width, height);
+            Bounds = new RectF(new Point(x, y), width, height);
             oldBounds = Bounds.Copy;
             Sprite = sprite;
         }

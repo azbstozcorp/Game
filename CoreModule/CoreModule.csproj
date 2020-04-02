@@ -54,6 +54,7 @@
     <Compile Include="Drawables\ImageButton.cs" />
     <Compile Include="Drawables\NumberBox.cs" />
     <Compile Include="Drawables\TextBox.cs" />
+    <Compile Include="Entities\Entity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saving\LevelIO.cs" />
     <Compile Include="Scenes\Level.cs" />

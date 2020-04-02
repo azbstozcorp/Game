@@ -17,7 +17,7 @@ namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
 
-        public List<PhysicsEntity> Entities { get; } = new List<PhysicsEntity>();
+        public List<Entity> Entities { get; } = new List<Entity>();
         public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
         public string Name { get; private set; } = "";
         public Point CameraLocation;
@@ -132,22 +132,23 @@ namespace CoreModule.Scenes {
                 if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
                 if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
                 TestPlayer.Velocity.X = vel;
-                if (CoreGame.Instance.GetKey(Key.W).Pressed) Entities[0].Velocity.Y = -1.5f;
+                if (CoreGame.Instance.GetKey(Key.W).Pressed) TestPlayer.Velocity.Y = -2.5f;
 
                 int cameraRatio = 1;
-                int newX = -(int)Entities[0].X +
+                Console.WriteLine(TestPlayer.X);
+                float newX = -TestPlayer.X +
                             CoreGame.Instance.ScreenWidth / 2 +
                             TestPlayer.Bounds.Width / 2 -
                             CoreGame.Instance.MouseX / cameraRatio +
                             CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
-                int newY = -(int)Entities[0].Y +
+                float newY = -TestPlayer.Y +
                             CoreGame.Instance.ScreenHeight / 2 +
                             TestPlayer.Bounds.Height / 2 -
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
 
-                CameraLocation.X = newX;
-                CameraLocation.Y = newY;
+                CameraLocation.X = (int)newX;
+                CameraLocation.Y = (int)newY;
 
                 foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
             }
