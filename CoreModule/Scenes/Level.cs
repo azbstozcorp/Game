@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using PixelEngine;
-using CoreModule.Drawables;
-using CoreModule.Entities;
-using CoreModule.Shapes;
 using CoreModule.Saving;
 using CoreModule.Terrain;
+using CoreModule.Entities;
+using CoreModule.Drawables;
 
 using Point = CoreModule.Shapes.Point;
 
@@ -27,7 +25,6 @@ namespace CoreModule.Scenes {
         public string Name { get; private set; } = "";
         public Point CameraLocation;
         public Chunk[,] chunks;
-        int tileIndex = 2;
 
         #region Editor Variables
         public bool Editing { get; private set; } = false;
@@ -154,6 +151,8 @@ namespace CoreModule.Scenes {
         }
 
         class EditorState : LevelState {
+            int tileIndex = 2;
+
             public override LevelState TryMoveNext() {
                 if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) return Instance.PlayingState;
                 else return this;
@@ -186,19 +185,19 @@ namespace CoreModule.Scenes {
                 if (CoreGame.Instance.GetKey(Key.A).Down) Instance.CameraLocation.X++;
                 if (CoreGame.Instance.GetKey(Key.D).Down) Instance.CameraLocation.X--;
 
-                Instance.tileIndex += (int)CoreGame.Instance.MouseScroll;
-                if (Instance.tileIndex == 0) Instance.tileIndex = TileManager.MaxValue;
-                if (Instance.tileIndex > TileManager.MaxValue) Instance.tileIndex = 1;
+                tileIndex += (int)CoreGame.Instance.MouseScroll;
+                if (tileIndex == 0) tileIndex = TileManager.MaxValue;
+                if (tileIndex > TileManager.MaxValue) tileIndex = 1;
 
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)Instance.tileIndex != Instance.GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
-                    Instance.GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)Instance.tileIndex), tileMouseX, tileMouseY);
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != Instance.GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
+                    Instance.GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);
                 }
             }
 
             public override void Draw() {
                 base.Draw();
 
-                Sprite currentTileSprite = TileManager.GetTexture((byte)Instance.tileIndex);
+                Sprite currentTileSprite = TileManager.GetTexture((byte)tileIndex);
                 if (currentTileSprite != null) {
                     Sprite previewTexture = new Sprite(Tile.TileSize, Tile.TileSize);
                     Sprite.Copy(currentTileSprite, previewTexture);

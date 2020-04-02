@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using CoreModule.Shapes;
+﻿using System.Collections.Generic;
 using CoreModule.Drawables;
 
 namespace CoreModule.Scenes {
+    /// <summary>
+    /// Base class for level states, when you want different editing / drawing functionality but not an entire different scene
+    /// </summary>
     public abstract class LevelState {
         public List<Drawable> Drawables { get; } = new List<Drawable>();
 
