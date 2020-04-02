@@ -61,8 +61,11 @@ namespace CoreModule.Drawables {
             values[minus.ToList().IndexOf(sender)].Value--;
         }
         private void Deselect(Button sender) {
-            if (sender is TextBox s)
-                s.Selected = false;
+            if(sender is NumberBox n) {
+                selected = values.ToList().IndexOf(n);
+            }
+            //if (sender is TextBox s)
+            //    s.Selected = false;
         }
         private void Increase(Button sender) {
             values[plus.ToList().IndexOf(sender)].Value++;

@@ -9,5 +9,5 @@
 9 fire False
 10 watertop False
 11 watermid False
-12 decalsign False
-13 sandwich True
+12 rock False
+13 decalsign False

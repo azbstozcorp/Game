@@ -7,34 +7,21 @@ using System.Threading.Tasks;
 using CoreModule.Shapes;
 using CoreModule.Terrain;
 using CoreModule.Scenes;
+using CoreModule.Drawables;
 using static CoreModule.Collision;
 
-namespace CoreModule.Drawables.Entities {
-    public class PhysicsEntity : Drawable {
-        public float X {
-            get => Bounds.Left; set {
-                Bounds.Right = value + Bounds.Width;
-                Bounds.Left = value;
-            }
-        }
-        public float Y {
-            get => Bounds.Top; set {
-                Bounds.Bottom = value + Bounds.Height;
-                Bounds.Top = value;
-            }
-        }
-
+namespace CoreModule.Entities {
+    public class PhysicsEntity : Entity {
         public bool DrawDebug { get; set; } = false;
         public float Gravity { get; set; } = 0.1f;
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
 
         HashSet<Chunk> containingChunks = new HashSet<Chunk>();
-        new RectF Bounds;
         RectF oldBounds;
 
         public PhysicsEntity(int x, int y, int width, int height, PixelEngine.Sprite sprite) {
-            Bounds = new Rect(new Point(x, y), width, height);
+            Bounds = new RectF(new Point(x, y), width, height);
             oldBounds = Bounds.Copy;
             Sprite = sprite;
         }
@@ -46,7 +33,7 @@ namespace CoreModule.Drawables.Entities {
             containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.BottomRight));
         }
 
-        void Move() {
+        void Move(float fElapsedTime) {
             List<Rect> collidingRects = new List<Rect>();
 
             Velocity.Y += Gravity;
@@ -132,7 +119,7 @@ namespace CoreModule.Drawables.Entities {
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
-            Move();
+            Move(fElapsedTime);
         }
 
         public override void Draw() {

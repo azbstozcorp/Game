@@ -54,20 +54,28 @@ namespace CoreModule.Terrain {
                                         ) return;
 
             for (int x = 0; x < NumTiles; x++) for (int y = 0; y < NumTiles; y++) {
+                    Point tilePos = new Point(x * Tile.TileSize + topLeft.X, y * Tile.TileSize + topLeft.Y);
+                    if (tilePos.X + Tile.TileSize < 0) continue;
+                    if (tilePos.Y + Tile.TileSize < 0) continue;
+                    if (tilePos.X > CoreGame.Instance.ScreenWidth) continue;
+                    if (tilePos.Y > CoreGame.Instance.ScreenHeight) continue;
+
                     Tile current = Tiles[x, y];
                     if (current == null) continue;
                     if (current.Sprite == null) continue;
 
+
                     var transform = new PixelEngine.Extensions.Transforms.Transform();
-                    transform.Translate(x * Tile.TileSize + topLeft.X, y * Tile.TileSize + topLeft.Y);
+                    transform.Translate(tilePos.X, tilePos.Y);
                     PixelEngine.Extensions.Transforms.Transform.DrawSprite(current.Sprite, transform);
                 }
 
-            if (Level.Instance.Editing)
+            if (Level.Instance.Editing) {
+                CoreGame.Instance.DrawRect(topLeft, bottomRight, lines);
                 foreach (Rect collider in Colliders) {
-                    CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, lines);
-                    CoreGame.Instance.DrawRect(topLeft, bottomRight, lines);
+                    //CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, lines);
                 }
+            }
         }
 
         public void SetTile(Tile t, int x, int y) {
