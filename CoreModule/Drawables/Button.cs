@@ -3,7 +3,7 @@ using CoreModule.Shapes;
 
 namespace CoreModule.Drawables {
     public class Button : Drawable {
-        public delegate void ButtonPressedEventHandler();
+        public delegate void ButtonPressedEventHandler(Button sender);
         public event ButtonPressedEventHandler Pressed;
 
         public string Text { get; set; }
@@ -15,14 +15,14 @@ namespace CoreModule.Drawables {
             Bounds = new Rect(new Point(centerX - text.Length * 8 / 2, centerY - 8 / 2), text.Length * 8, 8);
         }
 
-        public void Press() => Pressed?.Invoke();
+        public void Press() => Pressed?.Invoke(this);
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
             IsPressed = false;
             if (Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true)) {
-                if (CoreGame.Instance.GetMouse(PixelEngine.Mouse.Any).Pressed) Pressed?.Invoke();
+                if (CoreGame.Instance.GetMouse(PixelEngine.Mouse.Any).Pressed) Pressed?.Invoke(this);
                 IsPressed = true;
             }
         }

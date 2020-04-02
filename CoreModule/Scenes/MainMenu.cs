@@ -23,16 +23,21 @@ namespace CoreModule.Scenes {
             playButton.Pressed += PlayButton_ButtonPressed;
             Button quitButton = new Button("Quit", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 20);
             quitButton.Pressed += QuitButton_ButtonPressed;
+            Button settingsButton = new Button("Settings", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 10);
+            settingsButton.Pressed += SettingsButton_Pressed;
 
             Drawables.Add(playButton);
-            Drawables.Add(new Button("Settings", CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 + 10));
+            Drawables.Add(settingsButton);
             Drawables.Add(quitButton);
         }
 
-        private void PlayButton_ButtonPressed() {
+        private void PlayButton_ButtonPressed(Button sender) {
             CoreGame.Instance.PushScene(new LevelSelect());
         }
-        private void QuitButton_ButtonPressed() {
+        private void SettingsButton_Pressed(Button sender) {
+            CoreGame.Instance.PushScene(new TileEditor());
+        }
+        private void QuitButton_ButtonPressed(Button sender) {
             CoreGame.Instance.Finish();
         }
 

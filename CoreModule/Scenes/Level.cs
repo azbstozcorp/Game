@@ -176,8 +176,8 @@ namespace CoreModule.Scenes {
         }
 
         #region Editor Buttons
-        private void EditorButtonSave_Pressed() => SaveLevel();
-        private void EditorButtonTileDialog_Pressed() {
+        private void EditorButtonSave_Pressed(Button pressed) => SaveLevel();
+        private void EditorButtonTileDialog_Pressed(Button pressed) {
             throw new NotImplementedException();
         }
         #endregion Editor Buttons
@@ -256,18 +256,18 @@ namespace CoreModule.Scenes {
                 cancel.Pressed += Cancel_Pressed;
             }
 
-            private void Yes_Pressed() {
+            private void Yes_Pressed(Button pressed) {
                 Instance.SaveLevel();
                 CoreGame.Instance.PopScene();
                 CoreGame.Instance.PopScene();
             }
 
-            private void No_Pressed() {
+            private void No_Pressed(Button pressed) {
                 CoreGame.Instance.PopScene();
                 CoreGame.Instance.PopScene();
             }
 
-            private void Cancel_Pressed() {
+            private void Cancel_Pressed(Button pressed) {
                 CoreGame.Instance.PopScene();
                 Instance.Editing = true;
             }

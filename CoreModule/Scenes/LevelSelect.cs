@@ -38,11 +38,11 @@ namespace CoreModule.Scenes {
             if (File.Exists($"Assets/Levels/{newText}.bin")) load.Text = "Load";
             else load.Text = "New ";
         }
-        private void Load_Pressed() {
+        private void Load_Pressed(Button pressed) {
             Level level = Level.LoadLevel(path.Text);
             CoreGame.Instance.PushScene(level);
         }
-        private void Back_Pressed() {
+        private void Back_Pressed(Button pressed) {
             CoreGame.Instance.PopScene();
         }
 

@@ -8,22 +8,22 @@ namespace CoreModule.Drawables {
         public delegate void TextChangedEventHandler(string newText);
         public event TextChangedEventHandler TextChanged;
 
-        bool selected = false;
-        int location = 0;
+        public bool Selected { get; set; } = false;
+        protected int location = 0;
 
         public TextBox(string text, int centerX, int centerY, bool startAtEnd = true) : base(text, centerX, centerY) {
-            Pressed += () => selected = true;
+            Pressed += (Button pressed) => Selected = true;
             if (startAtEnd) location = text.Length;
         }
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
-            if (selected &&
+            if (Selected &&
                !Collision.WithinRect(Bounds, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY), true) &&
-               CoreGame.Instance.GetMouse(PixelEngine.Mouse.Left).Down) selected = false;
+               CoreGame.Instance.GetMouse(PixelEngine.Mouse.Left).Down) Selected = false;
 
-            if (selected) {
+            if (Selected) {
                 StringBuilder text = new StringBuilder(Text);
 
                 if (CoreGame.Instance.GetKey(PixelEngine.Key.Left).Pressed) {
@@ -106,7 +106,7 @@ namespace CoreModule.Drawables {
             base.Draw();
 
             CoreGame.Instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);
-            if (selected) {
+            if (Selected) {
                 CoreGame.Instance.DrawRect(Bounds.TopLeft - 1, Bounds.BottomRight + 1, CoreGame.Instance.Random(PixelEngine.Pixel.PresetPixels));
                 CoreGame.Instance.DrawLine(Bounds.TopLeft + new Point(location * 8, 0),
                                            Bounds.BottomLeft + new Point(location * 8, -1),
