@@ -46,7 +46,7 @@ namespace CoreModule.Drawables.Entities {
             containingChunks.Add(Level.Instance.GetChunkWithPoint(Bounds.BottomRight));
         }
 
-        void Move() {
+        void Move(float fElapsedTime) {
             List<Rect> collidingRects = new List<Rect>();
 
             Velocity.Y += Gravity;
@@ -132,7 +132,7 @@ namespace CoreModule.Drawables.Entities {
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
 
-            Move();
+            Move(fElapsedTime);
         }
 
         public override void Draw() {
