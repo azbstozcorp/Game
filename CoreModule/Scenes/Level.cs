@@ -17,6 +17,10 @@ namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
 
+        public LevelState CurrentState { get; private set; }
+        PlayState PlayingState = new PlayState();
+        EditorState EditingState = new EditorState();
+
         public List<Entity> Entities { get; } = new List<Entity>();
         public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
         public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
@@ -27,7 +31,6 @@ namespace CoreModule.Scenes {
 
         #region Editor Variables
         public bool Editing { get; private set; } = false;
-        List<Button> editorButtons = new List<Button>();
         #endregion Editor Variables
 
         #region Constructors
@@ -39,16 +42,7 @@ namespace CoreModule.Scenes {
             Entities.Add(TestPlayer);
             TestPlayer.DrawDebug = true;
 
-            Button editorButtonSave = new Button("Save",
-                CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1,
-                (4 * (editorButtons.Count() + 1)) + editorButtons.Count + 1);
-            editorButtonSave.Pressed += EditorButtonSave_Pressed;
-            editorButtons.Add(editorButtonSave);
-
-            Button editorButtonTileDialog = new Button("Tiles",
-                CoreGame.Instance.ScreenWidth - "Tiles".Length * 4 - 1,
-                (4 * editorButtons.Count() + 1) + editorButtons.Count + 1);
-            editorButtonTileDialog.Pressed += EditorButtonTileDialog_Pressed;
+            CurrentState = PlayingState;
         }
 
         public Level(string name) : this() {
@@ -104,74 +98,107 @@ namespace CoreModule.Scenes {
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
+            CurrentState = CurrentState.TryMoveNext();
+            CurrentState.Update(fElapsedTime);
+
             if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
             if (CoreGame.Instance.GetKey(Key.T).Pressed) CoreGame.Instance.PushScene(new TileEditor());
-
-            //if (LevelTriggers.Count == 0) LevelTriggers.Add(new LevelTrigger(new PointF(40, 40), new PointF(80, 80)) { Name = "Test" });
-
-            if (Editing) {
-                int chunkMouseX = (CoreGame.Instance.MouseX - CameraLocation.X) / Chunk.ChunkSize;
-                int chunkMouseY = (CoreGame.Instance.MouseY - CameraLocation.Y) / Chunk.ChunkSize;
-                int tileMouseX = ((CoreGame.Instance.MouseX - CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
-                int tileMouseY = ((CoreGame.Instance.MouseY - CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
-
-                if (CoreGame.Instance.GetKey(Key.W).Down) CameraLocation.Y++;
-                if (CoreGame.Instance.GetKey(Key.S).Down) CameraLocation.Y--;
-                if (CoreGame.Instance.GetKey(Key.A).Down) CameraLocation.X++;
-                if (CoreGame.Instance.GetKey(Key.D).Down) CameraLocation.X--;
-
-                tileIndex += (int)CoreGame.Instance.MouseScroll;
-                if (tileIndex == 0) tileIndex = TileManager.MaxValue;
-                if (tileIndex > TileManager.MaxValue) tileIndex = 1;
-
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
-                    GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);
-                }
-
-                foreach (Button b in editorButtons) b.Update(fElapsedTime);
-            }
-            else {
-                int vel = 0;
-                if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
-                if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
-                TestPlayer.Velocity.X = vel;
-                if (CoreGame.Instance.GetKey(Key.W).Pressed) TestPlayer.Velocity.Y = -2.5f;
-
-                int cameraRatio = 1;
-                Console.WriteLine(TestPlayer.X);
-                float newX = -TestPlayer.X +
-                            CoreGame.Instance.ScreenWidth / 2 +
-                            TestPlayer.Bounds.Width / 2 -
-                            CoreGame.Instance.MouseX / cameraRatio +
-                            CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
-                float newY = -TestPlayer.Y +
-                            CoreGame.Instance.ScreenHeight / 2 +
-                            TestPlayer.Bounds.Height / 2 -
-                            CoreGame.Instance.MouseY / cameraRatio +
-                            CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
-
-                CameraLocation.X = (int)newX;
-                CameraLocation.Y = (int)newY;
-
-                foreach (PhysicsEntity e in Entities) e.Update(fElapsedTime);
-                foreach (LevelTrigger t in LevelTriggers) t.Update(fElapsedTime);
-            }
 
             if (CoreGame.Instance.GetKey(Key.E).Pressed) Editing = !Editing;
         }
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
+            CurrentState.Draw();
 
             for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     GetChunk(i, j).Draw();
                 }
             foreach (PhysicsEntity e in Entities) e.Draw();
             foreach (LevelTrigger t in LevelTriggers) t.Draw();
+        }
 
-            if (Editing) {
-                foreach (Button b in editorButtons) b.Draw();
-                //CoreGame.Instance.DrawText(new Point(0, 0), $"{tileIndex}", Pixel.Presets.Red);
-                Sprite currentTileSprite = TileManager.GetTexture((byte)tileIndex);
+        #region States
+        class PlayState : LevelState {
+            public override LevelState TryMoveNext() {
+                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) return Instance.EditingState;
+                else return this;
+            }
+
+            public override void Update(float fElapsedTime) {
+                base.Update(fElapsedTime);
+
+                int vel = 0;
+                if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
+                if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
+                Instance.TestPlayer.Velocity.X = vel;
+                if (CoreGame.Instance.GetKey(Key.W).Pressed) Instance.TestPlayer.Velocity.Y = -2.5f;
+
+                int cameraRatio = 1;
+                float newX = -Instance.TestPlayer.X +
+                            CoreGame.Instance.ScreenWidth / 2 +
+                            Instance.TestPlayer.Bounds.Width / 2 -
+                            CoreGame.Instance.MouseX / cameraRatio +
+                            CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
+                float newY = -Instance.TestPlayer.Y +
+                            CoreGame.Instance.ScreenHeight / 2 +
+                            Instance.TestPlayer.Bounds.Height / 2 -
+                            CoreGame.Instance.MouseY / cameraRatio +
+                            CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
+
+                Instance.CameraLocation.X = (int)newX;
+                Instance.CameraLocation.Y = (int)newY;
+
+                foreach (PhysicsEntity e in Instance.Entities) e.Update(fElapsedTime);
+                foreach (LevelTrigger t in Instance.LevelTriggers) t.Update(fElapsedTime);
+            }
+        }
+
+        class EditorState : LevelState {
+            public override LevelState TryMoveNext() {
+                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) return Instance.PlayingState;
+                else return this;
+            }
+
+            public EditorState() {
+                Button editorButtonSave = new Button("Save", CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1, (10 * (Drawables.Count() + 1)) + Drawables.Count + 1);
+                editorButtonSave.Pressed += EditorButtonSave_Pressed;
+                Drawables.Add(editorButtonSave);
+
+                Button editorButtonTileDialog = new Button("Tiles", CoreGame.Instance.ScreenWidth - "Tiles".Length * 4 - 1, (10 * Drawables.Count() + 1) + Drawables.Count + 1);
+                editorButtonTileDialog.Pressed += EditorButtonTileDialog_Pressed;
+                Drawables.Add(editorButtonTileDialog);
+            }
+
+            private void EditorButtonSave_Pressed(Button pressed) => Instance.SaveLevel();
+            private void EditorButtonTileDialog_Pressed(Button pressed) {
+                throw new NotImplementedException();
+            }
+
+            public override void Update(float fElapsedTime) {
+                base.Update(fElapsedTime);
+                int chunkMouseX = (CoreGame.Instance.MouseX - Instance.CameraLocation.X) / Chunk.ChunkSize;
+                int chunkMouseY = (CoreGame.Instance.MouseY - Instance.CameraLocation.Y) / Chunk.ChunkSize;
+                int tileMouseX = ((CoreGame.Instance.MouseX - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
+                int tileMouseY = ((CoreGame.Instance.MouseY - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
+
+                if (CoreGame.Instance.GetKey(Key.W).Down) Instance.CameraLocation.Y++;
+                if (CoreGame.Instance.GetKey(Key.S).Down) Instance.CameraLocation.Y--;
+                if (CoreGame.Instance.GetKey(Key.A).Down) Instance.CameraLocation.X++;
+                if (CoreGame.Instance.GetKey(Key.D).Down) Instance.CameraLocation.X--;
+
+                Instance.tileIndex += (int)CoreGame.Instance.MouseScroll;
+                if (Instance.tileIndex == 0) Instance.tileIndex = TileManager.MaxValue;
+                if (Instance.tileIndex > TileManager.MaxValue) Instance.tileIndex = 1;
+
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)Instance.tileIndex != Instance.GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
+                    Instance.GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)Instance.tileIndex), tileMouseX, tileMouseY);
+                }
+            }
+
+            public override void Draw() {
+                base.Draw();
+
+                Sprite currentTileSprite = TileManager.GetTexture((byte)Instance.tileIndex);
                 if (currentTileSprite != null) {
                     Sprite previewTexture = new Sprite(Tile.TileSize, Tile.TileSize);
                     Sprite.Copy(currentTileSprite, previewTexture);
@@ -182,8 +209,8 @@ namespace CoreModule.Scenes {
                         }
                     }
 
-                    int tileLocX = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseX / Tile.TileSize)) * Tile.TileSize;
-                    int tileLocY = (int)/*(int)Math.Round*/((double)(CoreGame.Instance.MouseY / Tile.TileSize)) * Tile.TileSize;
+                    int tileLocX = (CoreGame.Instance.MouseX / Tile.TileSize) * Tile.TileSize;
+                    int tileLocY = (CoreGame.Instance.MouseY / Tile.TileSize) * Tile.TileSize;
 
                     PixelEngine.Extensions.Transforms.Transform transform = new PixelEngine.Extensions.Transforms.Transform();
                     transform.Translate(tileLocX, tileLocY);
@@ -191,13 +218,7 @@ namespace CoreModule.Scenes {
                 }
             }
         }
-
-        #region Editor Buttons
-        private void EditorButtonSave_Pressed(Button pressed) => SaveLevel();
-        private void EditorButtonTileDialog_Pressed(Button pressed) {
-            throw new NotImplementedException();
-        }
-        #endregion Editor Buttons
+        #endregion States
 
         #region Saving / Loading
         public static Level LoadLevel(string levelName) {
@@ -266,7 +287,7 @@ namespace CoreModule.Scenes {
             }
             if (location == data.Length) return;
 
-            int numTriggers = BitConverter.ToInt32(data, location); location += sizeof(int); 
+            int numTriggers = BitConverter.ToInt32(data, location); location += sizeof(int);
             for (int i = 0; i < numTriggers; i++) {
                 int triggerLength = BitConverter.ToInt32(data, location); location += sizeof(int);
                 LevelTrigger t = new LevelTrigger();

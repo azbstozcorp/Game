@@ -60,6 +60,7 @@
     <Compile Include="Saving\LevelIO.cs" />
     <Compile Include="Scenes\Level.cs" />
     <Compile Include="Scenes\LevelSelect.cs" />
+    <Compile Include="Scenes\LevelState.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Scenes\Scene.cs" />
     <Compile Include="Scenes\TileEditor.cs" />
