@@ -28,7 +28,7 @@ namespace CoreModule.Scenes {
         public TileEditor() {
             sprite = new Sprite(Tile.TileSize, Tile.TileSize);
 
-            scale = 200 / Tile.TileSize;
+            scale = 100 / Tile.TileSize;
             editingArea = new Rect(new Point(0, 0), scale * Tile.TileSize, scale * Tile.TileSize);
 
             picker = new ColourPicker(new Point(editingArea.Right + 20, 10));
@@ -63,7 +63,7 @@ namespace CoreModule.Scenes {
             existing.Clear();
             foreach (byte b in TileManager.IDs.Values) {
                 string name = TileManager.GetName(b);
-                existing[name] = new Button(name, 350, b * 10 + 5);
+                existing[name] = new Button(name, 250, b * 10 + 5);
                 existing[name].Pressed += ExistingClicked;
             }
         }
@@ -79,14 +79,20 @@ namespace CoreModule.Scenes {
             bool collide = TileManager.IsSolid(id);
             string name = TileManager.GetName(id);
 
+            Drawables.Remove(this.name);
+            this.name = new TextBox(name, picker.Bounds.Center.X, picker.Bounds.Bottom + 10);
+            Drawables.Add(this.name);
+
             this.id.Value = id;
             this.collide.On = collide;
-            this.name.Text = name;
 
-            sprite = TileManager.GetTexture(id);
+            sprite = new Sprite(Tile.TileSize, Tile.TileSize);
+            Sprite load = TileManager.GetTexture(id);
 
-            scale = 200 / sprite.Width;
-            editingArea = new Rect(new Point(0, 0), scale * sprite.Width, scale * sprite.Height);
+            for (int x = 0; x < sprite.Width; x++) for (int y = 0; y < sprite.Height; y++) sprite[x, y] = load[x, y];
+
+            //scale = 200 / sprite.Width;
+            //editingArea = new Rect(new Point(0, 0), scale * sprite.Width, scale * sprite.Height);
 
         }
         private void SaveTile(Button sender) {
@@ -125,11 +131,11 @@ namespace CoreModule.Scenes {
 
             if (Collision.WithinRect(editingArea, new Point(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY))) {
                 int editX = (CoreGame.Instance.MouseX) / scale;
-                int editY = (CoreGame.Instance.MouseY) / scale; 
+                int editY = (CoreGame.Instance.MouseY) / scale;
 
                 CoreGame.Instance.FillRect(new Point(editX * scale, editY * scale), scale, scale, picker.Value);
             }
-            
+
             CoreGame.Instance.DrawSprite(new Point(0, 0), sprite);
             CoreGame.Instance.DrawRect(editingArea.TopLeft, editingArea.BottomRight, Pixel.Presets.White);
 

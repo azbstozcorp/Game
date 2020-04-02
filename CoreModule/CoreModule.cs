@@ -27,7 +27,7 @@ namespace CoreModule {
             Console.WriteLine("Constructing core game");
             Instance = this;
 
-            Construct(400, 240, 4, 4, 120);
+            Construct(300, 180, 4, 4, 120);
 
             //Enable(Subsystem.Audio);
             PixelMode = Pixel.Mode.Alpha;
@@ -43,7 +43,7 @@ namespace CoreModule {
             base.OnUpdate(elapsed);
             SceneUpdate(elapsed);
             elapsed = oldFPS * 0.99f + elapsed * 0.01f;
-            AppName = $"Unnamed - {elapsed}";
+            AppName = $"Unnamed - {1f/elapsed}";
             oldFPS = elapsed;
         }
 
