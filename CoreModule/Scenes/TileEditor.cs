@@ -52,7 +52,6 @@ namespace CoreModule.Scenes {
             RefreshTileManager();
         }
 
-
         void RefreshTileManager() {
             TileManager.Graphics.Clear();
             TileManager.Collideable.Clear();
@@ -85,6 +84,10 @@ namespace CoreModule.Scenes {
             this.name.Text = name;
 
             sprite = TileManager.GetTexture(id);
+
+            scale = 200 / sprite.Width;
+            editingArea = new Rect(new Point(0, 0), scale * sprite.Width, scale * sprite.Height);
+
         }
         private void SaveTile(Button sender) {
             Sprite.Save(sprite, $"Assets/Terrain/{name.Text}.png");
@@ -111,7 +114,6 @@ namespace CoreModule.Scenes {
 
             foreach (Button b in existing.Values.ToArray()) b.Update(fElapsedTime);
         }
-
         public override void Draw() {
             base.Draw();
 
