@@ -98,10 +98,11 @@ namespace CoreModule.Scenes {
             CurrentState = CurrentState.TryMoveNext();
             CurrentState.Update(fElapsedTime);
 
-            if (CoreGame.Instance.GetKey(Key.Escape).Pressed) { Exit(); return; }
+            if (CoreGame.Instance.GetKey(Key.Escape).Pressed) {
+                Exit();
+                return;
+            }
             if (CoreGame.Instance.GetKey(Key.T).Pressed) CoreGame.Instance.PushScene(new TileEditor());
-
-            if (CoreGame.Instance.GetKey(Key.E).Pressed) Editing = !Editing;
         }
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
@@ -117,7 +118,10 @@ namespace CoreModule.Scenes {
         #region States
         class PlayState : LevelState {
             public override LevelState TryMoveNext() {
-                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) return Instance.EditingState;
+                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) {
+                    Instance.Editing = true;
+                    return Instance.EditingState;
+                }
                 else return this;
             }
 
@@ -154,7 +158,10 @@ namespace CoreModule.Scenes {
             int tileIndex = 2;
 
             public override LevelState TryMoveNext() {
-                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) return Instance.PlayingState;
+                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) {
+                    Instance.Editing = false;
+                    return Instance.PlayingState;
+                }
                 else return this;
             }
 
@@ -170,7 +177,6 @@ namespace CoreModule.Scenes {
 
             private void EditorButtonSave_Pressed(Button pressed) => Instance.SaveLevel();
             private void EditorButtonTileDialog_Pressed(Button pressed) {
-                throw new NotImplementedException();
             }
 
             public override void Update(float fElapsedTime) {
