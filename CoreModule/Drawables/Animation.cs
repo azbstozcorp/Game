@@ -6,10 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using PixelEngine;
+using PixelEngine.Extensions.Transforms;
 
 namespace CoreModule.Drawables {
     public class Animation : Drawable {
         public Sprite[] Frames { get; private set; }
+        public int Direction { get; set } = 1;
+        public Sprite Frame => Frames[frame];
         public bool Playing { get; set; }
 
         float frameTime = 0f;
@@ -66,7 +69,20 @@ namespace CoreModule.Drawables {
 
         public override void Draw() {
             base.Draw();
-            CoreGame.Instance.DrawSprite(Bounds.TopLeft + Scenes.Level.Instance.CameraLocation, Frames[frame]);
+
+            Transform transform = new Transform();
+
+            if (Direction < 0) {
+                transform.Scale(-1, 1);
+                transform.Translate(Bounds.Width, 0);
+            }
+            else {
+                transform.Scale(1, 1);
+            }
+
+            transform.Translate(X + Scenes.Level.Instance.CameraLocation.X, Y + Scenes.Level.Instance.CameraLocation.Y);
+
+            Transform.DrawSprite(Frame, transform);
         }
     }
 }
