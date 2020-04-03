@@ -20,8 +20,8 @@ namespace CoreModule.Scenes {
         EditorState EditingState = new EditorState();
 
         public List<Entity> Entities { get; } = new List<Entity>();
+        public Player Player { get; private set; }
         public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
-        public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
         public string Name { get; private set; } = "";
         public Point CameraLocation;
         public Chunk[,] chunks;
@@ -36,8 +36,7 @@ namespace CoreModule.Scenes {
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
-            Entities.Add(TestPlayer);
-            TestPlayer.DrawDebug = true;
+            Player = new Player(20, 80);
 
             CurrentState = PlayingState;
         }
@@ -108,6 +107,8 @@ namespace CoreModule.Scenes {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
             CurrentState.Draw();
 
+            Player.Draw();
+
             for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     GetChunk(i, j).Draw();
                 }
@@ -128,21 +129,17 @@ namespace CoreModule.Scenes {
             public override void Update(float fElapsedTime) {
                 base.Update(fElapsedTime);
 
-                int vel = 0;
-                if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
-                if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
-                Instance.TestPlayer.Velocity.X = vel;
-                if (CoreGame.Instance.GetKey(Key.W).Pressed) Instance.TestPlayer.Velocity.Y = -2.5f;
+                Instance.Player.Update(fElapsedTime);
 
                 int cameraRatio = 1;
-                float newX = -Instance.TestPlayer.X +
+                float newX = -Instance.Player.X +
                             CoreGame.Instance.ScreenWidth / 2 +
-                            Instance.TestPlayer.Bounds.Width / 2 -
+                            Instance.Player.Bounds.Width / 2 -
                             CoreGame.Instance.MouseX / cameraRatio +
                             CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
-                float newY = -Instance.TestPlayer.Y +
+                float newY = -Instance.Player.Y +
                             CoreGame.Instance.ScreenHeight / 2 +
-                            Instance.TestPlayer.Bounds.Height / 2 -
+                            Instance.Player.Bounds.Height / 2 -
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
 

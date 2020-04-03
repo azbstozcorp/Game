@@ -11,3 +11,5 @@
 11 watermid False
 12 rock False
 13 decalsign False
+14 ground2 False
+15 slab True

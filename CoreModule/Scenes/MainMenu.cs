@@ -14,7 +14,7 @@ using Point = CoreModule.Shapes.Point;
 namespace CoreModule.Scenes {
     public class MainMenu : Scene {
         static Random RNG = new Random();
-        [NonSerialized] static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
+        static Sprite banner = Sprite.Load("Assets/Scenes/MainMenu/banner.png");
 
         public MainMenu() {
             Drawables.Add(new Banner(CoreGame.Instance.ScreenWidth / 2, CoreGame.Instance.ScreenHeight / 2 - 30));
