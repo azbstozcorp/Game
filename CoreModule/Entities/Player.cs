@@ -12,15 +12,12 @@ using CoreModule.Drawables;
 
 namespace CoreModule.Entities {
     public class Player : PhysicsEntity {
-        public Animation Idle { get; } = Animation.Load("Player/idle");
-        public Animation Walk { get; } = Animation.Load("Player/walk");
-        public Animation Current { get; set; }
+        public Animator Animator = Animator.Load("Player/player");
 
         int direction = 1;
 
         public Player(int x, int y) : base(x, y, 10, 32, null) {
-            Current = Walk;
-            Current.Playing = true;
+            Animator.Playing = true;
         }
 
         public override void Update(float fElapsedTime) {
@@ -32,27 +29,29 @@ namespace CoreModule.Entities {
 
             Move(fElapsedTime);
 
-            Current.X = (int)X;
-            Current.Y = (int)Y;
-            Current.Update(fElapsedTime);
+            Animator.X = (int)X;
+            Animator.Y = (int)Y;
+            Animator.Update(fElapsedTime);
 
             foreach (Drawable child in Children) child.Update(fElapsedTime);
 
             if (vel != 0) {
                 direction = Math.Sign(vel);
-                Current = Walk;
+                if (Animator.CurrentAnimationName != "walk")
+                    Animator.Play("walk");
             }
             else {
-                Current = Idle;
+                if (Animator.CurrentAnimationName != "idle")
+                    Animator.Play("idle");
             }
 
-            Current.Direction = direction;
+            Animator.Direction = direction;
         }
 
         public override void Draw() {
             base.Draw();
 
-            Current.Draw();
+            Animator.Draw();
         }
     }
 }
