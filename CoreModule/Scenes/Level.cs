@@ -126,10 +126,19 @@ namespace CoreModule.Scenes {
                 else return this;
             }
 
+            float e = 0;
             public override void Update(float fElapsedTime) {
                 base.Update(fElapsedTime);
 
                 Instance.Player.Update(fElapsedTime);
+
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
+                    e += 0.1f;
+                    if (e >= 1) {
+                        e = 0;
+                        Sound.SoundPlayer.PlaySound("C:/Users/horac/source/repos/CoreModule/Game/Game/Assets/Audio/GS_handgun.wav");
+                    }
+                }
 
                 int cameraRatio = 1;
                 float newX = -Instance.Player.X +

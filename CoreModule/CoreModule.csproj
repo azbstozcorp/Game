@@ -33,11 +33,15 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="irrKlang.NET4">
+      <HintPath>..\..\..\..\..\Desktop\Coding\irrKlang-1.6.0\bin\dotnet-4\irrKlang.NET4.dll</HintPath>
+    </Reference>
     <Reference Include="PixelEngine">
       <HintPath>..\..\..\..\..\Desktop\Coding\PixelEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,12 +73,12 @@
     <Compile Include="Shapes\Line.cs" />
     <Compile Include="Shapes\Point.cs" />
     <Compile Include="Shapes\Rect.cs" />
+    <Compile Include="Sound\SoundPlayer.cs" />
     <Compile Include="Terrain\Chunk.cs" />
     <Compile Include="Terrain\Tile.cs" />
     <Compile Include="Terrain\TileManager.cs" />
     <Compile Include="Entities\PhysicsEntity.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"DomainEngine.exe"</PostBuildEvent>
