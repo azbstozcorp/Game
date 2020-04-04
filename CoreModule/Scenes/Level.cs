@@ -10,6 +10,7 @@ using CoreModule.Entities;
 using CoreModule.Drawables;
 
 using Point = CoreModule.Shapes.Point;
+using CoreModule.Shapes;
 
 namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
@@ -76,6 +77,9 @@ namespace CoreModule.Scenes {
         /// Sets the tile in a chunk
         /// </summary>
         public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) => GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
+
+        public static Point ScreenToWorld(Point p) => p - Instance.CameraLocation;
+        public static Point WorldToScreen(Point p) => p + Instance.CameraLocation;
         #endregion Chunk Utilities
 
         public void RefreshTextures() {
@@ -105,13 +109,12 @@ namespace CoreModule.Scenes {
         }
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
-            CurrentState.Draw();
 
             Player.Draw();
-
             for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     GetChunk(i, j).Draw();
                 }
+            CurrentState.Draw();
             foreach (PhysicsEntity e in Entities) e.Draw();
             foreach (LevelTrigger t in LevelTriggers) t.Draw();
         }
@@ -126,19 +129,10 @@ namespace CoreModule.Scenes {
                 else return this;
             }
 
-            float e = 0;
             public override void Update(float fElapsedTime) {
                 base.Update(fElapsedTime);
 
                 Instance.Player.Update(fElapsedTime);
-
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down) {
-                    e += 0.1f;
-                    if (e >= 1) {
-                        e = 0;
-                        Sound.SoundPlayer.PlaySound("C:/Users/horac/source/repos/CoreModule/Game/Game/Assets/Audio/GS_handgun.wav");
-                    }
-                }
 
                 int cameraRatio = 1;
                 float newX = -Instance.Player.X +
@@ -157,6 +151,60 @@ namespace CoreModule.Scenes {
 
                 foreach (PhysicsEntity e in Instance.Entities) e.Update(fElapsedTime);
                 foreach (LevelTrigger t in Instance.LevelTriggers) t.Update(fElapsedTime);
+            }
+
+            public override void Draw() {
+                base.Draw();
+
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Pressed) {
+                    Sound.SoundPlayer.PlayOnce("C:/Users/horac/source/repos/CoreModule/Game/Game/Assets/Audio/GS_handgun_bass.wav");
+                    Point from = Instance.Player.Bounds.TopLeft;
+                    PointF through = ScreenToWorld(new PointF(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY));
+
+                    float angle = (float)(Math.Atan2(through.Y - from.Y, through.X - from.X));
+                    Line result = new Line(from, angle, 1000);
+
+                    Rect screen = new Rect(ScreenToWorld(new Point(0, 0)), ScreenToWorld(new Point(CoreGame.Instance.ScreenWidth, CoreGame.Instance.ScreenHeight)));
+                    HashSet<Chunk> chunks = new HashSet<Chunk> {
+                        Instance.GetChunkWithPoint(screen.TopLeft),
+                        Instance.GetChunkWithPoint(screen.TopRight),
+                        Instance.GetChunkWithPoint(screen.BottomLeft),
+                        Instance.GetChunkWithPoint(screen.BottomRight)
+                    };
+
+                    List<Point> points = new List<Point>();
+                    foreach (Chunk c in chunks) {
+                        foreach (Rect r in c.Colliders) {
+                            Rect check = r.Copy;
+                            check.Move(c.Bounds.Left, c.Bounds.Top);
+                            if (Collision.LineOverlapsRect(result, check)) {
+                                if (Collision.LinesIntersect(result, check.TLBL)) points.Add(Collision.IntersectionOf(result, check.TLBL));
+                                if (Collision.LinesIntersect(result, check.BRTR)) points.Add(Collision.IntersectionOf(result, check.BRTR));
+                                if (Collision.LinesIntersect(result, check.TLTR)) points.Add(Collision.IntersectionOf(result, check.TLTR));
+                                if (Collision.LinesIntersect(result, check.BRBL)) points.Add(Collision.IntersectionOf(result, check.BRBL));
+                            }
+                        }
+                    }
+
+                    if (points.Count > 0) {
+                        Point closest = WorldToScreen(Collision.Closest(from, points.ToArray()));
+
+                        int chunkHitX = (closest.X - Instance.CameraLocation.X) / Chunk.ChunkSize;
+                        int chunkHitY = (closest.Y - Instance.CameraLocation.Y) / Chunk.ChunkSize;
+                        int tileHitX = ((closest.X - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
+                        int tileHitY = ((closest.Y - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
+
+                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY);
+                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY);
+                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY);
+                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY + 1);
+                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY - 1);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY + 1);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY - 1);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY + 1);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY - 1);
+                    }
+                }
             }
         }
 

@@ -15,6 +15,7 @@ namespace CoreModule.Shapes {
                 b = value;
             }
         }
+
         Point a, b;
 
         public Line() {
@@ -22,6 +23,11 @@ namespace CoreModule.Shapes {
             b = new Point();
         }
         public Line(Point a, Point b) : this() { Start = a; End = b; }
+        public Line(Point a, float angle, float length) : this() {
+            Start = a;
+            End.X = (int)(System.Math.Cos(angle) * length * 180.0 / System.Math.PI);
+            End.Y = (int)(System.Math.Sin(angle) * length * 180.0 / System.Math.PI);
+        }
 
         public static bool operator ==(Line a, Line b) => a.Start == b.Start && a.End == b.End;
         public static bool operator !=(Line a, Line b) => !(a == b);

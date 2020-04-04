@@ -14,8 +14,12 @@ namespace CoreModule.Sound {
             engine = new ISoundEngine();
         }
 
-        public static void PlaySound(string name) {
+        public static void PlayOnce(string name) {
             engine.Play2D(name);
+        }
+
+        public static void PlayLooping(string name) {
+            engine.Play2D(name, true);
         }
     }
 }
