@@ -166,7 +166,7 @@ namespace CoreModule.Scenes {
                 base.Draw();
 
                 if (CoreGame.Instance.GetMouse(Mouse.Left).Pressed) {
-                    Sound.SoundPlayer.PlayOnce("C:/Users/horac/source/repos/CoreModule/Game/Game/Assets/Audio/GS_handgun_bass.wav");
+                    Sound.SoundPlayer.PlayOnce("Assets/Audio/GS_handgun_bass.wav");
                     Point from = Instance.Player.Bounds.TopLeft;
                     PointF through = ScreenToWorld(new PointF(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY));
 
