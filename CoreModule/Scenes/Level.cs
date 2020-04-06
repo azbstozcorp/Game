@@ -170,15 +170,13 @@ namespace CoreModule.Scenes {
                     Point from = Instance.Player.Bounds.TopLeft;
                     PointF through = ScreenToWorld(new PointF(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY));
 
-                    //ParticleSystem.Flash(10);
-
                     float angle = (float)(Math.Atan2(through.Y - from.Y, through.X - from.X));
                     Line result = new Line(from, angle, 1000);
 
                     int dirX = -Math.Sign(through.X - Instance.Player.X);
                     int dirY = -Math.Sign(through.Y - Instance.Player.Y);
-                    //Instance.CameraLocation.X -= dirX * 10;
-                    //Instance.CameraLocation.Y -= dirY * 3;
+                    Instance.CameraLocation.X -= dirX * 10;
+                    Instance.CameraLocation.Y -= dirY * 3;
 
                     Rect screen = new Rect(ScreenToWorld(new Point(0, 0)), ScreenToWorld(new Point(CoreGame.Instance.ScreenWidth, CoreGame.Instance.ScreenHeight)));
                     HashSet<Chunk> chunks = new HashSet<Chunk> {
@@ -206,31 +204,15 @@ namespace CoreModule.Scenes {
                     if (points.Count > 0) {
                         Point closest = WorldToScreen(Collision.Closest(from, points.ToArray()));
 
-                        for (int i = 0; i < 20; i++)
-                        Instance.ParticleManager.AddParticle(new Hit(ScreenToWorld(closest + (dirX, 0)).X, ScreenToWorld(closest).Y, CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
-                                                            CoreGame.Instance.Random(-4f, 4f), CoreGame.Instance.GetScreenPixel(closest.X - dirX * 2, closest.Y - dirY)) { Bounciness = CoreGame.Instance.Random(0.3f,0.5f)});
+                        for (int i = 0; i < 5; i++) {
+                            Instance.ParticleManager.AddParticle(
+                                new Hit(ScreenToWorld(closest + (dirX, 0)).X, ScreenToWorld(closest).Y, CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
+                                    CoreGame.Instance.Random(-4f, 4f),
+                                    CoreGame.Instance.GetScreenPixel(closest.X - dirX * 2, closest.Y - dirY)) 
+                                        { Bounciness = CoreGame.Instance.Random(0.3f, 0.5f) }
+                                );
+                        }
 
-                            //ParticleSystem.Add(new Particle(ScreenToWorld(closest), 1000,
-                            //                                CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
-                            //                                CoreGame.Instance.Random(-4f, 2f),
-                            //                                CoreGame.Instance.Random(1, 2)));
-
-                        //ParticleSystem.Particles.Add(new Hit(ScreenToWorld(closest)));
-
-                        //int chunkHitX = (closest.X - Instance.CameraLocation.X) / Chunk.ChunkSize;
-                        //int chunkHitY = (closest.Y - Instance.CameraLocation.Y) / Chunk.ChunkSize;
-                        //int tileHitX = ((closest.X - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
-                        //int tileHitY = ((closest.Y - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
-
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY); 
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY + 1);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY - 1);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY + 1);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY - 1);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY + 1);
-                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY - 1);
 
                         CoreGame.Instance.DrawLine(WorldToScreen(from), closest, Pixel.Presets.White);
                     }
