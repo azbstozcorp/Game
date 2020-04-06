@@ -10,6 +10,10 @@ using CoreModule.Saving;
 namespace CoreModule.Entities {
     public class LevelTrigger : Entity, ISerializable<LevelTrigger> {
         public enum TriggerType : byte {
+            Transition,
+        }
+
+        public enum CollisionFlags : byte {
             Player, Enemy,
             DamageBlunt,
             DamagePierce,
@@ -19,11 +23,18 @@ namespace CoreModule.Entities {
         }
 
         public string Name { get; set; } = "unnamed";
-        public List<TriggerType> Flags { get; set; } = new List<TriggerType>();
+        public TriggerType Type { get; set; }
+        public List<CollisionFlags> Flags { get; set; } = new List<CollisionFlags>();
 
         public LevelTrigger() { }
-        public LevelTrigger(PointF topLeft, PointF bottomRight) {
+        public LevelTrigger(PointF topLeft, PointF bottomRight, TriggerType type = TriggerType.Transition) {
             Bounds = new RectF(topLeft, bottomRight);
+        }
+
+        public override void Update(float fElapsedTime) {
+            base.Update(fElapsedTime);
+
+
         }
 
         public override void Draw() {
@@ -36,7 +47,7 @@ namespace CoreModule.Entities {
             if (Scenes.Level.Instance.Editing) CoreGame.Instance.DrawText(Bounds.TopLeft + (PointF)Scenes.Level.Instance.CameraLocation + (1, 2), Name, PixelEngine.Pixel.Presets.Blue);
         }
 
-        public byte[] GetSaveData() {
+        public virtual byte[] GetSaveData() {
             List<byte> toReturn = new List<byte>();
 
             byte[] nameBytes = Encoding.ASCII.GetBytes(Name);
@@ -61,11 +72,11 @@ namespace CoreModule.Entities {
 
             byte flagsByteLength = (byte)Flags.Count;
             toReturn.Add(flagsByteLength);
-            foreach (TriggerType t in Flags) toReturn.Add((byte)t);
+            foreach (CollisionFlags t in Flags) toReturn.Add((byte)t);
 
             return toReturn.ToArray();
         }
-        public void LoadSaveData(byte[] data) {
+        public virtual void LoadSaveData(byte[] data) {
             int location = 0;
             byte nameByteLength = data[location]; location++;
             Name = Encoding.ASCII.GetString(data, location, nameByteLength); location += nameByteLength;
@@ -78,7 +89,7 @@ namespace CoreModule.Entities {
 
             byte flagsByteLength = data[location]; location++;
             for (byte i = 0; i < flagsByteLength; i++) {
-                Flags.Add((TriggerType)data[location]); location++;
+                Flags.Add((CollisionFlags)data[location]); location++;
             }
         }
     }
