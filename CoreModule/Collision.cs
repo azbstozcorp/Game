@@ -1,5 +1,9 @@
 ﻿// Collision.cs
 using CoreModule.Shapes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace CoreModule {
     public static class Collision {
         /// <summary>
@@ -25,7 +29,14 @@ namespace CoreModule {
             a.Left < b.Right && a.Right > b.Left &&
             a.Top < b.Bottom && a.Bottom > b.Top;
 
-        public static bool LineOverlapsRect(Line line, Rect rect) => WithinRect(rect, line.Start) || WithinRect(rect, line.End);
+        public static bool LineOverlapsRect(Line line, Rect rect) {
+            bool left = LinesIntersect(line, rect.TLBL);
+            bool right = LinesIntersect(line, rect.BRTR);
+            bool top = LinesIntersect(line, rect.TLTR);
+            bool bottom = LinesIntersect(line, rect.BRBL);
+
+            return left || right || top || bottom;
+        }
 
         static bool CCW(Point a, Point b, Point c) => (c.Y - a.Y) * (b.X - a.X) > (b.Y - a.Y) * (c.X - a.X);
         /// <summary>
@@ -34,20 +45,27 @@ namespace CoreModule {
         public static bool LinesIntersect(Line a, Line b) =>
             CCW(a.Start, b.Start, b.End) != CCW(a.End, b.Start, b.End) && CCW(a.Start, a.End, b.Start) != CCW(a.Start, a.End, b.End);
 
+        public static Point Closest(Point from, Point[] testing) {
+            int pow2(int n) => n * n;
+            int dist2(int x1, int y1, int x2, int y2) => pow2(x2 - x1) + pow2(y2 - y1);
+
+            Point closest = testing[0];
+            for (int i = 0; i < testing.Length; i++)
+                if (dist2(from.X, from.Y, testing[i].X, testing[i].Y) < dist2(from.X, from.Y, closest.X, closest.Y))
+                    closest = testing[i];
+            return closest;
+        }
+
         /// <summary>
         /// Find the intersection point of two lines
         /// </summary>
         public static Point IntersectionOf(Line a, Line b) {
-            int a1 = a.End.Y - a.Start.Y;
-            int b1 = a.Start.X - a.End.X;
-            int c1 = a1 * a.Start.X + b1 * a.Start.Y;
-
-            int a2 = b.End.Y - b.Start.Y;
-            int b2 = b.Start.X - b.End.X;
-            int c2 = a1 * b.Start.X + b1 * b.Start.Y;
-
-            int delta = a1 * b2 - a2 * b1;
-            return delta == 0 ? null : new Point((b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta);
+            float p0_x = a.Start.X, p0_y = a.Start.Y, p1_x = a.End.X, p1_y = a.End.Y, p2_x = b.Start.X, p2_y = b.Start.Y, p3_x = b.End.X, p3_y = b.End.Y, s1_x, s1_y, s2_x, s2_y, s, t;
+            s1_x = p1_x - p0_x; s1_y = p1_y - p0_y;
+            s2_x = p3_x - p2_x; s2_y = p3_y - p2_y;
+            s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+            t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+            return s >= 0 && s <= 1 && t >= 0 && t <= 1 ? new Point((int)(p0_x + (t * s1_x)), (int)(p0_y + (t * s1_y))) : null;
         }
         /// <summary>
         /// Find the intersection rect of a rect and a rect

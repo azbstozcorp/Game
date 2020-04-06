@@ -8,6 +8,8 @@ namespace CoreModule.Shapes {
         public int X { get; set; }
         public int Y { get; set; }
 
+        public int Magnitude => (int)System.Math.Sqrt(X * X + Y * Y);
+
         public Point() { }
         public Point(int x, int y) { X = x; Y = y; }
         public Point(PixelEngine.Point from) { X = from.X; Y = from.Y; }
@@ -46,6 +48,8 @@ namespace CoreModule.Shapes {
     public class PointF {
         public float X { get; set; }
         public float Y { get; set; }
+
+        public float Magnitude => (float)System.Math.Sqrt(X * X + Y * Y);
 
         public PointF() { }
         public PointF(float x, float y) { X = x; Y = y; }

@@ -10,6 +10,11 @@
         public Point BottomRight => new Point(Right, Bottom);
         public Point Center => new Point(Left + Width / 2, Top + Height / 2);
 
+        public Line TLTR => new Line(TopLeft, TopRight);
+        public Line TLBL => new Line(TopLeft, BottomLeft);
+        public Line BRTR => new Line(BottomRight, TopRight);
+        public Line BRBL => new Line(BottomRight, BottomLeft);
+
         public int Width => Right - Left;
         public int Height => Bottom - Top;
 

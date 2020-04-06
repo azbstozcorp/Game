@@ -33,11 +33,15 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="irrKlang.NET4">
+      <HintPath>..\..\..\..\..\Desktop\Coding\irrKlang-1.6.0\bin\dotnet-4\irrKlang.NET4.dll</HintPath>
+    </Reference>
     <Reference Include="PixelEngine">
       <HintPath>..\..\..\..\..\Desktop\Coding\PixelEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,7 +50,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />
+    <Compile Include="Collision.cs" />
+    <Compile Include="CoreModule.cs" />
+    <Compile Include="Ballistics\Ballistics.cs" />
+    <Compile Include="Drawables\Animator.cs" />
     <Compile Include="Drawables\Button.cs" />
     <Compile Include="Drawables\CheckBox.cs" />
     <Compile Include="Drawables\ColourPicker.cs" />
@@ -56,23 +63,27 @@
     <Compile Include="Drawables\TextBox.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\LevelTrigger.cs" />
+    <Compile Include="Entities\Particles\ParticleManager.cs" />
+    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Guns\Gun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saving\LevelIO.cs" />
     <Compile Include="Scenes\Level.cs" />
     <Compile Include="Scenes\LevelSelect.cs" />
     <Compile Include="Scenes\LevelState.cs" />
+    <Compile Include="Scenes\LineTesting.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Scenes\Scene.cs" />
     <Compile Include="Scenes\TileEditor.cs" />
     <Compile Include="Shapes\Line.cs" />
     <Compile Include="Shapes\Point.cs" />
     <Compile Include="Shapes\Rect.cs" />
+    <Compile Include="Sound\SoundPlayer.cs" />
     <Compile Include="Terrain\Chunk.cs" />
     <Compile Include="Terrain\Tile.cs" />
     <Compile Include="Terrain\TileManager.cs" />
     <Compile Include="Entities\PhysicsEntity.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"DomainEngine.exe"</PostBuildEvent>

@@ -4,16 +4,19 @@ using System.Text;
 using System.Collections.Generic;
 
 using PixelEngine;
+using CoreModule.Shapes;
 using CoreModule.Saving;
 using CoreModule.Terrain;
 using CoreModule.Entities;
 using CoreModule.Drawables;
+using CoreModule.Entities.Particles;
 
 using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
+        public string Name { get; private set; } = "";
 
         public LevelState CurrentState { get; private set; }
         PlayState PlayingState = new PlayState();
@@ -21,8 +24,9 @@ namespace CoreModule.Scenes {
 
         public List<Entity> Entities { get; } = new List<Entity>();
         public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
-        public PhysicsEntity TestPlayer { get; } = new PhysicsEntity(10, 100, 10, 20, null);
-        public string Name { get; private set; } = "";
+        public ParticleManager ParticleManager { get; } = new ParticleManager();
+
+        public Player Player { get; private set; }
         public Point CameraLocation;
         public Chunk[,] chunks;
 
@@ -36,8 +40,8 @@ namespace CoreModule.Scenes {
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
-            Entities.Add(TestPlayer);
-            TestPlayer.DrawDebug = true;
+            Drawables.Add(ParticleManager);
+            Player = new Player(20, 80);
 
             CurrentState = PlayingState;
         }
@@ -77,6 +81,9 @@ namespace CoreModule.Scenes {
         /// Sets the tile in a chunk
         /// </summary>
         public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) => GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
+
+        public static Point ScreenToWorld(Point p) => p - Instance.CameraLocation;
+        public static Point WorldToScreen(Point p) => p + Instance.CameraLocation;
         #endregion Chunk Utilities
 
         public void RefreshTextures() {
@@ -106,13 +113,16 @@ namespace CoreModule.Scenes {
         }
         public override void Draw() {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
-            CurrentState.Draw();
 
+            Player.Draw();
             for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
                     GetChunk(i, j).Draw();
                 }
+            CurrentState.Draw();
             foreach (PhysicsEntity e in Entities) e.Draw();
             foreach (LevelTrigger t in LevelTriggers) t.Draw();
+
+            ParticleManager.Draw();
         }
 
         #region States
@@ -128,29 +138,86 @@ namespace CoreModule.Scenes {
             public override void Update(float fElapsedTime) {
                 base.Update(fElapsedTime);
 
-                int vel = 0;
-                if (CoreGame.Instance.GetKey(Key.A).Down) vel--;
-                if (CoreGame.Instance.GetKey(Key.D).Down) vel++;
-                Instance.TestPlayer.Velocity.X = vel;
-                if (CoreGame.Instance.GetKey(Key.W).Pressed) Instance.TestPlayer.Velocity.Y = -2.5f;
+                Instance.Player.Update(fElapsedTime);
 
                 int cameraRatio = 1;
-                float newX = -Instance.TestPlayer.X +
+                float newX = -Instance.Player.X +
                             CoreGame.Instance.ScreenWidth / 2 +
-                            Instance.TestPlayer.Bounds.Width / 2 -
+                            Instance.Player.Bounds.Width / 2 -
                             CoreGame.Instance.MouseX / cameraRatio +
                             CoreGame.Instance.ScreenWidth / (cameraRatio * 2);
-                float newY = -Instance.TestPlayer.Y +
+                float newY = -Instance.Player.Y +
                             CoreGame.Instance.ScreenHeight / 2 +
-                            Instance.TestPlayer.Bounds.Height / 2 -
+                            Instance.Player.Bounds.Height / 2 -
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
+
+                newX = CoreGame.Instance.Lerp(Instance.CameraLocation.X, newX, 0.1f);
+                newY = CoreGame.Instance.Lerp(Instance.CameraLocation.Y, newY, 0.1f);
 
                 Instance.CameraLocation.X = (int)newX;
                 Instance.CameraLocation.Y = (int)newY;
 
                 foreach (PhysicsEntity e in Instance.Entities) e.Update(fElapsedTime);
                 foreach (LevelTrigger t in Instance.LevelTriggers) t.Update(fElapsedTime);
+            }
+
+            public override void Draw() {
+                base.Draw();
+
+                if (CoreGame.Instance.GetMouse(Mouse.Left).Pressed) {
+                    Sound.SoundPlayer.PlayOnce("C:/Users/horac/source/repos/CoreModule/Game/Game/Assets/Audio/GS_handgun_bass.wav");
+                    Point from = Instance.Player.Bounds.TopLeft;
+                    PointF through = ScreenToWorld(new PointF(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY));
+
+                    float angle = (float)(Math.Atan2(through.Y - from.Y, through.X - from.X));
+                    Line result = new Line(from, angle, 1000);
+
+                    int dirX = -Math.Sign(through.X - Instance.Player.X);
+                    int dirY = -Math.Sign(through.Y - Instance.Player.Y);
+                    Instance.CameraLocation.X -= dirX * 10;
+                    Instance.CameraLocation.Y -= dirY * 3;
+
+                    Rect screen = new Rect(ScreenToWorld(new Point(0, 0)), ScreenToWorld(new Point(CoreGame.Instance.ScreenWidth, CoreGame.Instance.ScreenHeight)));
+                    HashSet<Chunk> chunks = new HashSet<Chunk> {
+                        Instance.GetChunkWithPoint(screen.TopLeft),
+                        Instance.GetChunkWithPoint(screen.TopRight),
+                        Instance.GetChunkWithPoint(screen.BottomLeft),
+                        Instance.GetChunkWithPoint(screen.BottomRight)
+                    };
+                    //List<Chunk> chunks = Instance.chunks.Cast<Chunk>().ToList();
+
+                    List<Point> points = new List<Point>();
+                    foreach (Chunk c in chunks) {
+                        foreach (Rect r in c.Colliders) {
+                            Rect check = r.Copy;
+                            check.Move(c.Bounds.Left, c.Bounds.Top);
+                            if (Collision.LineOverlapsRect(result, check)) {
+                                if (Collision.LinesIntersect(result, check.TLBL)) points.Add(Collision.IntersectionOf(result, check.TLBL));
+                                if (Collision.LinesIntersect(result, check.BRTR)) points.Add(Collision.IntersectionOf(result, check.BRTR));
+                                if (Collision.LinesIntersect(result, check.TLTR)) points.Add(Collision.IntersectionOf(result, check.TLTR));
+                                if (Collision.LinesIntersect(result, check.BRBL)) points.Add(Collision.IntersectionOf(result, check.BRBL));
+                            }
+                        }
+                    }
+
+                    if (points.Count > 0) {
+                        Point closest = WorldToScreen(Collision.Closest(from, points.ToArray()));
+
+                        for (int i = 0; i < 5; i++) {
+                            Instance.ParticleManager.AddParticle(
+                                new Hit(ScreenToWorld(closest + (dirX, 0)).X, ScreenToWorld(closest).Y, CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
+                                    CoreGame.Instance.Random(-4f, 4f),
+                                    CoreGame.Instance.GetScreenPixel(closest.X - dirX * 2, closest.Y - dirY)) 
+                                        { Bounciness = CoreGame.Instance.Random(0.3f, 0.5f) }
+                                );
+                        }
+
+
+                        CoreGame.Instance.DrawLine(WorldToScreen(from), closest, Pixel.Presets.White);
+                    }
+                    else CoreGame.Instance.DrawLine(WorldToScreen(from), WorldToScreen(result.End), Pixel.Presets.White);
+                }
             }
         }
 

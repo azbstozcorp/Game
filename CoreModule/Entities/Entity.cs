@@ -8,14 +8,14 @@ using CoreModule.Shapes;
 
 namespace CoreModule.Entities {
     public abstract class Entity : Drawables.Drawable {
-        public float X {
-            get => this.Bounds.Left; set {
+        public new float X {
+            get => Bounds.Left; set {
                 Bounds.Right = value + Bounds.Width;
                 Bounds.Left = value;
             }
         }
-        public float Y {
-            get => this.Bounds.Top; set {
+        public new float Y {
+            get => Bounds.Top; set {
                 Bounds.Bottom = value + Bounds.Height;
                 Bounds.Top = value;
             }
