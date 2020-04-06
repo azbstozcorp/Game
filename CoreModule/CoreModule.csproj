@@ -50,7 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />
+    <Compile Include="Collision.cs" />
+    <Compile Include="CoreModule.cs" />
     <Compile Include="Ballistics\Ballistics.cs" />
     <Compile Include="Drawables\Animator.cs" />
     <Compile Include="Drawables\Button.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Drawables\TextBox.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\LevelTrigger.cs" />
+    <Compile Include="Entities\Particles\ParticleManager.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Guns\Gun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

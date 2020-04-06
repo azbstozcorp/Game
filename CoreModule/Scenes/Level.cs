@@ -4,26 +4,29 @@ using System.Text;
 using System.Collections.Generic;
 
 using PixelEngine;
+using CoreModule.Shapes;
 using CoreModule.Saving;
 using CoreModule.Terrain;
 using CoreModule.Entities;
 using CoreModule.Drawables;
+using CoreModule.Entities.Particles;
 
 using Point = CoreModule.Shapes.Point;
-using CoreModule.Shapes;
 
 namespace CoreModule.Scenes {
     public class Level : Scene, ISerializable<Level> {
         public static Level Instance { get; private set; }
+        public string Name { get; private set; } = "";
 
         public LevelState CurrentState { get; private set; }
         PlayState PlayingState = new PlayState();
         EditorState EditingState = new EditorState();
 
         public List<Entity> Entities { get; } = new List<Entity>();
-        public Player Player { get; private set; }
         public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
-        public string Name { get; private set; } = "";
+        public ParticleManager ParticleManager { get; } = new ParticleManager();
+
+        public Player Player { get; private set; }
         public Point CameraLocation;
         public Chunk[,] chunks;
 
@@ -37,6 +40,7 @@ namespace CoreModule.Scenes {
             Instance = this;
             CameraLocation = new Point();
             TileManager.Setup();
+            Drawables.Add(ParticleManager);
             Player = new Player(20, 80);
 
             CurrentState = PlayingState;
@@ -117,6 +121,8 @@ namespace CoreModule.Scenes {
             CurrentState.Draw();
             foreach (PhysicsEntity e in Entities) e.Draw();
             foreach (LevelTrigger t in LevelTriggers) t.Draw();
+
+            ParticleManager.Draw();
         }
 
         #region States
@@ -146,6 +152,9 @@ namespace CoreModule.Scenes {
                             CoreGame.Instance.MouseY / cameraRatio +
                             CoreGame.Instance.ScreenHeight / (cameraRatio * 2);
 
+                newX = CoreGame.Instance.Lerp(Instance.CameraLocation.X, newX, 0.1f);
+                newY = CoreGame.Instance.Lerp(Instance.CameraLocation.Y, newY, 0.1f);
+
                 Instance.CameraLocation.X = (int)newX;
                 Instance.CameraLocation.Y = (int)newY;
 
@@ -161,8 +170,15 @@ namespace CoreModule.Scenes {
                     Point from = Instance.Player.Bounds.TopLeft;
                     PointF through = ScreenToWorld(new PointF(CoreGame.Instance.MouseX, CoreGame.Instance.MouseY));
 
+                    //ParticleSystem.Flash(10);
+
                     float angle = (float)(Math.Atan2(through.Y - from.Y, through.X - from.X));
                     Line result = new Line(from, angle, 1000);
+
+                    int dirX = -Math.Sign(through.X - Instance.Player.X);
+                    int dirY = -Math.Sign(through.Y - Instance.Player.Y);
+                    //Instance.CameraLocation.X -= dirX * 10;
+                    //Instance.CameraLocation.Y -= dirY * 3;
 
                     Rect screen = new Rect(ScreenToWorld(new Point(0, 0)), ScreenToWorld(new Point(CoreGame.Instance.ScreenWidth, CoreGame.Instance.ScreenHeight)));
                     HashSet<Chunk> chunks = new HashSet<Chunk> {
@@ -171,6 +187,7 @@ namespace CoreModule.Scenes {
                         Instance.GetChunkWithPoint(screen.BottomLeft),
                         Instance.GetChunkWithPoint(screen.BottomRight)
                     };
+                    //List<Chunk> chunks = Instance.chunks.Cast<Chunk>().ToList();
 
                     List<Point> points = new List<Point>();
                     foreach (Chunk c in chunks) {
@@ -189,21 +206,35 @@ namespace CoreModule.Scenes {
                     if (points.Count > 0) {
                         Point closest = WorldToScreen(Collision.Closest(from, points.ToArray()));
 
-                        int chunkHitX = (closest.X - Instance.CameraLocation.X) / Chunk.ChunkSize;
-                        int chunkHitY = (closest.Y - Instance.CameraLocation.Y) / Chunk.ChunkSize;
-                        int tileHitX = ((closest.X - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
-                        int tileHitY = ((closest.Y - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
+                        for (int i = 0; i < 20; i++)
+                        Instance.ParticleManager.AddParticle(new Hit(ScreenToWorld(closest + (dirX, 0)).X, ScreenToWorld(closest).Y, CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
+                                                            CoreGame.Instance.Random(-4f, 4f), CoreGame.Instance.GetScreenPixel(closest.X - dirX * 2, closest.Y - dirY)) { Bounciness = CoreGame.Instance.Random(0.3f,0.5f)});
 
-                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY);
-                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY);
-                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY);
-                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY + 1);
-                        Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY - 1);
+                            //ParticleSystem.Add(new Particle(ScreenToWorld(closest), 1000,
+                            //                                CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
+                            //                                CoreGame.Instance.Random(-4f, 2f),
+                            //                                CoreGame.Instance.Random(1, 2)));
+
+                        //ParticleSystem.Particles.Add(new Hit(ScreenToWorld(closest)));
+
+                        //int chunkHitX = (closest.X - Instance.CameraLocation.X) / Chunk.ChunkSize;
+                        //int chunkHitY = (closest.Y - Instance.CameraLocation.Y) / Chunk.ChunkSize;
+                        //int tileHitX = ((closest.X - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
+                        //int tileHitY = ((closest.Y - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
+
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY); 
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY + 1);
+                        //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX, tileHitY - 1);
                         //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY + 1);
                         //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY - 1);
                         //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX - 1, tileHitY + 1);
                         //Instance.GetChunk(chunkHitX, chunkHitY).SetTile(new Tile(1), tileHitX + 1, tileHitY - 1);
+
+                        CoreGame.Instance.DrawLine(WorldToScreen(from), closest, Pixel.Presets.White);
                     }
+                    else CoreGame.Instance.DrawLine(WorldToScreen(from), WorldToScreen(result.End), Pixel.Presets.White);
                 }
             }
         }

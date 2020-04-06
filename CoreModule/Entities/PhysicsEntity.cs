@@ -17,6 +17,10 @@ namespace CoreModule.Entities {
         public PointF Velocity { get; set; } = new PointF();
         public PixelEngine.Sprite Sprite;
 
+        public bool OnGround { get; private set; }
+        public float Bounciness { get; set; } = 0f;
+        public float Friction { get; set; } = 0f;
+
         HashSet<Chunk> containingChunks = new HashSet<Chunk>();
         RectF oldBounds;
 
@@ -81,11 +85,12 @@ namespace CoreModule.Entities {
                     Rect overlap = IntersectionRect(vertical, collision);
                     if (down) {
                         newBounds.Move(0, -overlap.Height);
+                        OnGround = true;
                     }
                     if (up) {
                         newBounds.Move(0, overlap.Height);
                     }
-                    Velocity.Y = 0;
+                    Velocity.Y = -Velocity.Y * Bounciness;
                     break;
                 }
             }
@@ -109,10 +114,15 @@ namespace CoreModule.Entities {
                     if (right) {
                         newBounds.Move(-overlap.Width, 0);
                     }
-                    Velocity.X = 0;
+                    Velocity.X = -Velocity.X * Bounciness;
                     break;
                 }
             }
+            if (OnGround && Friction != 0) Velocity.X /= Friction;
+
+            if (Math.Abs(Velocity.X) < 0.1) Velocity.X = 0;
+            if (Math.Abs(Velocity.Y) < 0.1) Velocity.Y = 0;
+
             Bounds = newBounds;
         }
 
