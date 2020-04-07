@@ -1,0 +1,22 @@
+﻿[ ]	Level
+	[ ]	Name												String
+	[ ]	Connections											List
+		[ ]	Name of connected level							String
+	[ ]	Decorations
+		[ ]	Destructibles
+		[ ]	Spawnpoints
+			[ ]	Items										List
+			[ ]	Player										List
+			[ ]	Enemies										List
+	[ ]	Chunks												List
+		[ ]	Chunk											Chunk
+			[ ]	Position									Point
+				[ ]	World X									Int32
+				[ ]	World Y									Int32
+			[ ]	Tiles										2D Array
+				[ ]	Tile									Tile
+					[ ]	Type								Short
+					[ ]	Collideable							Bool
+					[ ]	Destructible						Bool
+					[ ]	Friction							Single
+					[ ]	Hardness							Single

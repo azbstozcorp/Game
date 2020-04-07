@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 using PixelEngine;
 using CoreModule.Shapes;
-using CoreModule.Saving;
 using CoreModule.Terrain;
 using CoreModule.Entities;
 using CoreModule.Drawables;
@@ -14,13 +13,12 @@ using CoreModule.Entities.Particles;
 using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Scenes {
-    public class Level : Scene, ISerializable<Level> {
+    public class Level : Scene {
         public static Level Instance { get; private set; }
         public string Name { get; private set; } = "";
 
         public LevelState CurrentState { get; private set; }
         PlayState PlayingState = new PlayState();
-        EditorState EditingState = new EditorState();
 
         public List<Entity> Entities { get; } = new List<Entity>();
         public List<LevelTrigger> LevelTriggers { get; } = new List<LevelTrigger>();
@@ -97,7 +95,6 @@ namespace CoreModule.Scenes {
         }
 
         void Exit() {
-            CoreGame.Instance.PushScene(new ExitConfirmDialogue());
         }
 
         public override void Update(float fElapsedTime) {
@@ -128,11 +125,7 @@ namespace CoreModule.Scenes {
         #region States
         class PlayState : LevelState {
             public override LevelState TryMoveNext() {
-                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) {
-                    Instance.Editing = true;
-                    return Instance.EditingState;
-                }
-                else return this;
+                return this;
             }
 
             public override void Update(float fElapsedTime) {
@@ -173,199 +166,6 @@ namespace CoreModule.Scenes {
                 }
             }
         }
-
-        class EditorState : LevelState {
-            int tileIndex = 2;
-
-            public override LevelState TryMoveNext() {
-                if (CoreGame.Instance.GetKey(Key.E).Pressed && CoreGame.Instance.GetKey(Key.Control).Down) {
-                    Instance.Editing = false;
-                    return Instance.PlayingState;
-                }
-                else return this;
-            }
-
-            public EditorState() {
-                Button editorButtonSave = new Button("Save", CoreGame.Instance.ScreenWidth - "Save".Length * 4 - 1, (10 * (Drawables.Count() + 1)) + Drawables.Count + 1);
-                editorButtonSave.Pressed += EditorButtonSave_Pressed;
-                Drawables.Add(editorButtonSave);
-
-                Button editorButtonTileDialog = new Button("Tiles", CoreGame.Instance.ScreenWidth - "Tiles".Length * 4 - 1, (10 * Drawables.Count() + 1) + Drawables.Count + 1);
-                editorButtonTileDialog.Pressed += EditorButtonTileDialog_Pressed;
-                Drawables.Add(editorButtonTileDialog);
-            }
-
-            private void EditorButtonSave_Pressed(Button pressed) => Instance.SaveLevel();
-            private void EditorButtonTileDialog_Pressed(Button pressed) {
-            }
-
-            public override void Update(float fElapsedTime) {
-                base.Update(fElapsedTime);
-                int chunkMouseX = (CoreGame.Instance.MouseX - Instance.CameraLocation.X) / Chunk.ChunkSize;
-                int chunkMouseY = (CoreGame.Instance.MouseY - Instance.CameraLocation.Y) / Chunk.ChunkSize;
-                int tileMouseX = ((CoreGame.Instance.MouseX - Instance.CameraLocation.X) % Chunk.ChunkSize) / Tile.TileSize;
-                int tileMouseY = ((CoreGame.Instance.MouseY - Instance.CameraLocation.Y) % Chunk.ChunkSize) / Tile.TileSize;
-
-                if (CoreGame.Instance.GetKey(Key.W).Down) Instance.CameraLocation.Y++;
-                if (CoreGame.Instance.GetKey(Key.S).Down) Instance.CameraLocation.Y--;
-                if (CoreGame.Instance.GetKey(Key.A).Down) Instance.CameraLocation.X++;
-                if (CoreGame.Instance.GetKey(Key.D).Down) Instance.CameraLocation.X--;
-
-                tileIndex += (int)CoreGame.Instance.MouseScroll;
-                if (tileIndex == 0) tileIndex = TileManager.MaxValue;
-                if (tileIndex > TileManager.MaxValue) tileIndex = 1;
-
-                if (CoreGame.Instance.GetMouse(Mouse.Left).Down && (byte)tileIndex != Instance.GetChunk(chunkMouseX, chunkMouseY).GetTile(tileMouseX, tileMouseY)?.Type) {
-                    Instance.GetChunk(chunkMouseX, chunkMouseY).SetTile(new Tile((byte)tileIndex), tileMouseX, tileMouseY);
-                }
-            }
-
-            public override void Draw() {
-                base.Draw();
-
-                Sprite currentTileSprite = TileManager.GetTexture((byte)tileIndex);
-                if (currentTileSprite != null) {
-                    Sprite previewTexture = new Sprite(Tile.TileSize, Tile.TileSize);
-                    Sprite.Copy(currentTileSprite, previewTexture);
-                    for (int x = 0; x < previewTexture.Width; x++) {
-                        for (int y = 0; y < previewTexture.Height; y++) {
-                            Pixel current = previewTexture[x, y];
-                            previewTexture[x, y] = new Pixel(current.R, current.G, current.B, 100);
-                        }
-                    }
-
-                    int tileLocX = (CoreGame.Instance.MouseX / Tile.TileSize) * Tile.TileSize;
-                    int tileLocY = (CoreGame.Instance.MouseY / Tile.TileSize) * Tile.TileSize;
-
-                    PixelEngine.Extensions.Transforms.Transform transform = new PixelEngine.Extensions.Transforms.Transform();
-                    transform.Translate(tileLocX, tileLocY);
-                    PixelEngine.Extensions.Transforms.Transform.DrawSprite(previewTexture, transform);
-                }
-            }
-        }
         #endregion States
-
-        #region Saving / Loading
-        public static Level LoadLevel(string levelName) {
-            string path = $"Assets/Levels/{levelName}.bin";
-            if (System.IO.File.Exists(path)) return LevelIO.LoadLevel(path);
-            else return new Level(levelName);
-        }
-        public void SaveLevel() {
-            string path = $"Assets/Levels/{Name}.bin";
-            LevelIO.SaveLevel(this, path);
-        }
-        public byte[] GetSaveData() {
-            byte[] name = Encoding.ASCII.GetBytes(Name);
-            byte nameLength = (byte)name.Length;
-
-            byte chunkWidthX = BitConverter.GetBytes(chunks.GetLength(0)).First();
-            byte chunkWidthY = BitConverter.GetBytes(chunks.GetLength(1)).First();
-
-            List<byte[]> chunkData = new List<byte[]>(); // Will be /* (0,0)(0,1)(0,2)(0,3) ... */
-            for (int x = 0; x < chunks.GetLength(0); x++) {         /* (1,0)(1,1)(1,2)(1,3) ... */
-                for (int y = 0; y < chunks.GetLength(1); y++) {
-                    chunkData.Add(chunks[x, y].GetSaveData());
-                }
-            }
-
-            List<byte> data = new List<byte>();
-            data.Add(nameLength);
-            data.AddRange(name);
-            data.Add(chunkWidthX);
-            data.Add(chunkWidthY);
-            foreach (byte[] chunkBytes in chunkData)
-                data.AddRange(chunkBytes);
-
-            List<byte> triggerData = new List<byte>();
-            foreach (LevelTrigger trigger in LevelTriggers) {
-                byte[] tData = trigger.GetSaveData();
-                int tDataLength = tData.Length;
-                triggerData.AddRange(BitConverter.GetBytes(tDataLength));
-                triggerData.AddRange(tData);
-            }
-            data.AddRange(BitConverter.GetBytes(LevelTriggers.Count));
-            data.AddRange(triggerData);
-
-            return data.ToArray();
-        }
-        public void LoadSaveData(byte[] data) {
-            int location = 0;
-
-            byte nameLength = data[location]; /*                             */ location++;
-            string name = Encoding.ASCII.GetString(data, location, nameLength); location += nameLength;
-            Name = name;
-
-            byte chunkWidthX = data[location]; /*                            */ location++;
-            byte chunkWidthY = data[location]; /*                            */ location++;
-            chunks = new Chunk[chunkWidthX, chunkWidthY];
-
-            int chunkByteSize = Chunk.NumTiles * Chunk.NumTiles;
-            for (int x = 0; x < chunkWidthX; x++) {
-                for (int y = 0; y < chunkWidthY; y++) {
-                    chunks[x, y] = new Chunk((x * Chunk.ChunkSize, y * Chunk.ChunkSize));
-                    chunks[x, y].WorldPosition.X = x;
-                    chunks[x, y].WorldPosition.Y = y;
-                    chunks[x, y].LoadSaveData(data.Skip(location).Take(chunkByteSize).ToArray());
-                    location += chunkByteSize;
-                }
-            }
-            if (location == data.Length) return;
-
-            int numTriggers = BitConverter.ToInt32(data, location); location += sizeof(int);
-            for (int i = 0; i < numTriggers; i++) {
-                int triggerLength = BitConverter.ToInt32(data, location); location += sizeof(int);
-                LevelTrigger t = new LevelTrigger();
-                t.LoadSaveData(data.Skip(location).Take(triggerLength).ToArray());
-                LevelTriggers.Add(t);
-                location += triggerLength;
-            }
-        }
-
-        class ExitConfirmDialogue : Scene {
-            Button yes, no, cancel;
-            Button[] controls;
-
-            static string ask = "Would you like to save?";
-
-            public ExitConfirmDialogue() {
-                yes = new Button("Yes", ask.Length * 8 + 1 + "Yes".Length * 4 + 1 + 10, 5);
-                no = new Button("No", ask.Length * 8 + 2 + "Yes".Length * 8 + 1 + "No".Length * 4 + 1 + 22, 5);
-                cancel = new Button("Cancel", ask.Length * 8 + 2 + "Yes".Length * 8 + 2 + "No".Length * 8 + 1 + "Cancel".Length * 4 + 1 + 34, 5);
-                controls = new[] { yes, no, cancel };
-
-                yes.Pressed += Yes_Pressed;
-                no.Pressed += No_Pressed;
-                cancel.Pressed += Cancel_Pressed;
-            }
-
-            private void Yes_Pressed(Button pressed) {
-                Instance.SaveLevel();
-                CoreGame.Instance.PopScene();
-                CoreGame.Instance.PopScene();
-            }
-
-            private void No_Pressed(Button pressed) {
-                CoreGame.Instance.PopScene();
-                CoreGame.Instance.PopScene();
-            }
-
-            private void Cancel_Pressed(Button pressed) {
-                CoreGame.Instance.PopScene();
-                Instance.Editing = true;
-            }
-
-            public override void Update(float fElapsedTime) {
-                foreach (Button b in controls) b.Update(fElapsedTime);
-                if (CoreGame.Instance.GetKey(Key.Escape).Pressed) cancel.Press();
-            }
-
-            public override void Draw() {
-                CoreGame.Instance.FillRect(new Point(0, 0), CoreGame.Instance.ScreenWidth, 10, Pixel.Presets.Black);
-                CoreGame.Instance.DrawText(new Point(0, 0), ask, Pixel.Presets.White);
-                foreach (Button b in controls) b.Draw();
-            }
-        }
-        #endregion Saving / Loading
     }
 }

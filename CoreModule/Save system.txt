@@ -1,0 +1,19 @@
+﻿[ ]	Define "Saver" class for type
+	[ ]	Saver
+		[~]	Name
+			[ ]	Save to this path within Assets/Save
+		[ ]	Mark members to save
+			[ ]	If the member has a saver defined, save using that saver
+		[ ]	Save type to file
+			[ ]	Write each member
+				[ ]	Member name length
+				[ ]	Member name
+				[ ]	Member type length
+				[ ]	Member type
+				[ ]	Member data length
+				[ ]	Member data
+		[ ]	Load type from file
+			[ ]	Create instance of type
+			[ ]	Load members
+				[ ]	Reflect values into instance
+		[ ]	Sub-savers for subfolders

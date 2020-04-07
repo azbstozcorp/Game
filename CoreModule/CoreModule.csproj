@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -70,7 +71,10 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Guns\Gun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Saving\LevelIO.cs" />
+    <Compile Include="Saving\Saver.cs" />
+    <Compile Include="Saving\SaverAttributes.cs" />
+    <Compile Include="Saving\SaverDeserializers.cs" />
+    <Compile Include="Saving\SaverSerializers.cs" />
     <Compile Include="Scenes\Level.cs" />
     <Compile Include="Scenes\LevelSelect.cs" />
     <Compile Include="Scenes\LevelState.cs" />
@@ -87,6 +91,11 @@
     <Compile Include="Terrain\TileManager.cs" />
     <Compile Include="Entities\PhysicsEntity.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Level Components.txt" />
+    <Content Include="Save system.txt" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"DomainEngine.exe"</PostBuildEvent>
