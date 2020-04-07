@@ -3,7 +3,7 @@ namespace CoreModule.Shapes {
     /// <summary>
     /// Line in 2d space
     /// </summary>
-    [System.Serializable]
+    [Saving.Saveable]
     public class Line {
         public Point Start {
             get => a; set {
@@ -16,7 +16,8 @@ namespace CoreModule.Shapes {
             }
         }
 
-        Point a, b;
+        [Saving.At("points")] Point a;
+        [Saving.At("points")] Point b;
 
         public Line() {
             a = new Point();

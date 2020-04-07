@@ -2,7 +2,7 @@
     /// <summary>
     /// Rectangle in 2d space
     /// </summary>
-    [System.Serializable]
+    [Saving.Saveable]
     public class Rect {
         public Point TopLeft => new Point(Left, Top);
         public Point TopRight => new Point(Right, Top);
@@ -18,10 +18,10 @@
         public int Width => Right - Left;
         public int Height => Bottom - Top;
 
-        public int Top { get; set; }
-        public int Left { get; set; }
-        public int Bottom { get; set; }
-        public int Right { get; set; }
+        [Saving.At("sides")] public int Top { get; set; }
+        [Saving.At("sides")] public int Left { get; set; }
+        [Saving.At("sides")] public int Bottom { get; set; }
+        [Saving.At("sides")] public int Right { get; set; }
 
         public Rect() { }
         public Rect(Point topLeft, Point bottomRight) : this() {
@@ -57,7 +57,7 @@
         }
     }
 
-    [System.Serializable]
+    [Saving.Saveable]
     public class RectF {
         public PointF TopLeft => new PointF(Left, Top);
         public PointF TopRight => new PointF(Right, Top);
@@ -68,10 +68,10 @@
         public float Width => Right - Left;
         public float Height => Bottom - Top;
 
-        public float Top { get; set; }
-        public float Left { get; set; }
-        public float Bottom { get; set; }
-        public float Right { get; set; }
+        [Saving.At("sides")] public float Top { get; set; }
+        [Saving.At("sides")] public float Left { get; set; }
+        [Saving.At("sides")] public float Bottom { get; set; }
+        [Saving.At("sides")] public float Right { get; set; }
 
         public RectF() { }
         public RectF(PointF topLeft, PointF bottomRight) : this() {

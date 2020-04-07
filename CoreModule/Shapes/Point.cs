@@ -3,10 +3,10 @@ namespace CoreModule.Shapes {
     /// <summary>
     /// Point in 2d space
     /// </summary>
-    [System.Serializable]
+    [Saving.Saveable]
     public class Point {
-        public int X { get; set; }
-        public int Y { get; set; }
+        [Saving.At("coordinates")] public int X { get; set; }
+        [Saving.At("coordinates")] public int Y { get; set; }
 
         public int Magnitude => (int)System.Math.Sqrt(X * X + Y * Y);
 
@@ -21,7 +21,7 @@ namespace CoreModule.Shapes {
         public static implicit operator Point(PixelEngine.Point p) => new Point(p);
         public static implicit operator Point((int x, int y) p) => new Point(p);
         public static implicit operator PixelEngine.Point(Point p) => new PixelEngine.Point(p.X, p.Y);
-        public static implicit operator (int x, int y) (Point p) => (p.X, p.Y);
+        public static implicit operator (int x, int y)(Point p) => (p.X, p.Y);
 
         public static Point operator +(Point a, int b) => new Point(a.X + b, a.Y + b);
         public static Point operator -(Point a, int b) => a + -b;
@@ -44,10 +44,10 @@ namespace CoreModule.Shapes {
         }
     }
 
-    [System.Serializable]
+    [Saving.Saveable]
     public class PointF {
-        public float X { get; set; }
-        public float Y { get; set; }
+        [Saving.At("coordinates")] public float X { get; set; }
+        [Saving.At("coordinates")] public float Y { get; set; }
 
         public float Magnitude => (float)System.Math.Sqrt(X * X + Y * Y);
 
@@ -62,7 +62,7 @@ namespace CoreModule.Shapes {
         public static implicit operator PointF(PixelEngine.Point p) => new PointF(p);
         public static implicit operator PointF((float x, float y) p) => new PointF(p);
         public static implicit operator PixelEngine.Point(PointF p) => new PixelEngine.Point((int)p.X, (int)p.Y);
-        public static implicit operator (float x, float y) (PointF p) => (p.X, p.Y);
+        public static implicit operator (float x, float y)(PointF p) => (p.X, p.Y);
         public static implicit operator PointF(Point p) => new PointF(p.X, p.Y);
         public static implicit operator Point(PointF p) => new Point((int)p.X, (int)p.Y);
 
