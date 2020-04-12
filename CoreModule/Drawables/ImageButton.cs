@@ -14,10 +14,12 @@ namespace CoreModule.Drawables {
             Image = image;
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
+            CoreGame.Instance.PixelMode = Pixel.Mode.Alpha;
             CoreGame.Instance.DrawSprite(Bounds.TopRight, Image);
+            CoreGame.Instance.PixelMode = Pixel.Mode.Normal;
         }
     }
 }

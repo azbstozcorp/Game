@@ -12,9 +12,9 @@
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
             wasOnGround = OnGround;
-            if (age > maxAge) Scenes.Level.Instance.ParticleManager.RemoveParticle(this);
+            if (age > maxAge) ParticleManager.Instance.RemoveParticle(this);
         }
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
         }
     }

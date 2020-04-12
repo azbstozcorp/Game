@@ -17,8 +17,8 @@ namespace CoreModule.Ballistics {
             float angle = (float)(Math.Atan2(through.Y - from.Y, through.X - from.X));
             Line result = new Line(from, angle, 1000);
 
-            int dirX = -Math.Sign(through.X - Scenes.Level.Instance.Player.X);
-            int dirY = -Math.Sign(through.Y - Scenes.Level.Instance.Player.Y);
+            int dirX = -Math.Sign(through.X - from.X);
+            int dirY = -Math.Sign(through.Y - from.Y);
             Scenes.Level.Instance.CameraLocation.X -= dirX * 10;
             Scenes.Level.Instance.CameraLocation.Y -= dirY * 3;
 
@@ -48,7 +48,7 @@ namespace CoreModule.Ballistics {
                 Point closest = Collision.Closest(from, points.ToArray()).ToScreen();
 
                 for (int i = 0; i < 5; i++) {
-                    Scenes.Level.Instance.ParticleManager.AddParticle(
+                    ParticleManager.Instance.AddParticle(
                         new Hit((closest + (dirX, 0)).ToWorld().X, closest.ToWorld().Y, CoreGame.Instance.Random(dirX * 1f, dirX * 4f),
                             CoreGame.Instance.Random(-4f, 4f),
                             CoreGame.Instance.GetScreenPixel(closest.X - dirX * 2, closest.Y - dirY)) { Bounciness = CoreGame.Instance.Random(0.3f, 0.5f) }

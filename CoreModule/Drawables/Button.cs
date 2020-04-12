@@ -27,7 +27,7 @@ namespace CoreModule.Drawables {
             }
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
             CoreGame.Instance.DrawText(Bounds.TopLeft, Text, PixelEngine.Pixel.Presets.White);

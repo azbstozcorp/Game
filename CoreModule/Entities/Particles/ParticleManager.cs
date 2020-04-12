@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace CoreModule.Entities.Particles {
     public class ParticleManager : Drawables.Drawable {
+        public static ParticleManager Instance { get; private set; }
+
         HashSet<Particle> removalQueue = new HashSet<Particle>();
 
         System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
 
         public ParticleManager() {
+            Instance = this;
             timer.Start();
         }
 
@@ -25,7 +28,7 @@ namespace CoreModule.Entities.Particles {
             foreach (Particle p in removalQueue) Children.Remove(p);
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
             foreach (Drawables.Drawable d in Children) d.Draw();
         }

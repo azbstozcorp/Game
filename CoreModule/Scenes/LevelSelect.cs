@@ -39,7 +39,8 @@ namespace CoreModule.Scenes {
             else load.Text = "New ";
         }
         private void Load_Pressed(Button pressed) {
-            Level level = Level.LoadLevel(path.Text);
+            Level level = new Level(path.Text);
+            level.Load();
             CoreGame.Instance.PushScene(level);
         }
         private void Back_Pressed(Button pressed) {

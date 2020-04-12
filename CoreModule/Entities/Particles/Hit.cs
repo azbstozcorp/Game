@@ -20,7 +20,7 @@
             Colour = new PixelEngine.Pixel(255, 255, 255, (byte)CoreGame.Instance.Map(age, 0, maxAge, 255, 0));
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw(); 
             CoreGame.Instance.DrawLine(lastlast.ToScreen(), last.ToScreen(), Colour);
             CoreGame.Instance.DrawLine(Bounds.TopLeft.ToScreen(), last.ToScreen(), Colour);

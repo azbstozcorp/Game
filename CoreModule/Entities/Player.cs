@@ -48,7 +48,7 @@ namespace CoreModule.Entities {
             Animator.Direction = direction;
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
             Animator.Draw();

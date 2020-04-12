@@ -30,7 +30,7 @@ namespace CoreModule.Drawables {
         public virtual void Update(float fElapsedTime) {
             foreach (Drawable child in Children) child.Update(fElapsedTime);
         }
-        public virtual void Draw() {
+        public virtual void Draw(bool drawDebug = false) {
             foreach (Drawable child in Children) child.Draw();
         }
     }

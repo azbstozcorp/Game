@@ -37,14 +37,14 @@ namespace CoreModule.Entities {
 
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
             CoreGame.Instance.DrawRect(Bounds.TopLeft + (PointF)Scenes.Level.Instance.CameraLocation,
                                        Bounds.BottomRight + (PointF)Scenes.Level.Instance.CameraLocation,
                                        PixelEngine.Pixel.Presets.Blue);
 
-            if (Scenes.Level.Instance.Editing) CoreGame.Instance.DrawText(Bounds.TopLeft + (PointF)Scenes.Level.Instance.CameraLocation + (1, 2), Name, PixelEngine.Pixel.Presets.Blue);
+            if (drawDebug) CoreGame.Instance.DrawText(Bounds.TopLeft + (PointF)Scenes.Level.Instance.CameraLocation + (1, 2), Name, PixelEngine.Pixel.Presets.Blue);
         }
 
         public virtual byte[] GetSaveData() {

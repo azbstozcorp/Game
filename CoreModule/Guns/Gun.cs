@@ -21,7 +21,7 @@ namespace CoreModule.Guns {
 
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
         }
     }

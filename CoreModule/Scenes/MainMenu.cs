@@ -55,7 +55,7 @@ namespace CoreModule.Scenes {
                                   banner.Width, banner.Height);
             }
 
-            public override void Draw() {
+            public override void Draw(bool drawDebug = false) {
                 base.Draw();
                 Point drawPosition = Collision.WithinRect(Bounds, (CoreGame.Instance.MouseX, CoreGame.Instance.MouseY))
                     ? new Point(Position.X + RNG.Next(-1, 2), Position.Y + RNG.Next(-1, 2)) : Position;

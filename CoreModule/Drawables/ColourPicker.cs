@@ -85,7 +85,7 @@ namespace CoreModule.Drawables {
             foreach (Drawable d in Drawables) d.Update(fElapsedTime);
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
             CoreGame.Instance.FillRect(Bounds.TopLeft, Bounds.BottomRight, Pixel.Presets.DarkGrey);

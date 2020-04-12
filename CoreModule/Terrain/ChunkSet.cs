@@ -36,6 +36,15 @@ namespace CoreModule.Terrain {
             if (y < MinY) MinY = y;
         }
 
+        public void Draw() {
+            for (int x = MinX; x < Width; x++) {
+                for (int y = MinX; y < Height; y++) {
+                    Chunk current = GetChunk(x, y);
+                    current?.Draw();
+                }
+            }
+        }
+
         public void SaveTo(string path) {
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             for (int x = MinX; x < Width; x++) {

@@ -23,7 +23,7 @@ namespace CoreModule.Terrain {
             Type = type;
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
         }
     }

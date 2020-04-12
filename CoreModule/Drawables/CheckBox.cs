@@ -15,7 +15,7 @@ namespace CoreModule.Drawables {
             On ^= true;
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
             CoreGame.Instance.DrawRect(Bounds.TopLeft, Bounds.BottomRight, PixelEngine.Pixel.Presets.DarkGrey);
             if (On) CoreGame.Instance.FillRect(Bounds.TopLeft + 1, Bounds.BottomRight, PixelEngine.Pixel.Presets.White);

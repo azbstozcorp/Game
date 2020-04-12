@@ -20,10 +20,10 @@ namespace CoreModule.Terrain {
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
 
-        int tileCount = 0;
-
-        public Chunk() {
-            Bounds = new Rect();
+        public Chunk(int worldX, int worldY) {
+            Bounds = new Rect(worldX * ChunkSize, worldY * ChunkSize, ChunkSize, ChunkSize);
+            WorldPosition.X = worldX;
+            WorldPosition.Y = worldY;
 
             for (int x = 0; x < NumTiles; x++) {
                 for (int y = 0; y < NumTiles; y++) {
@@ -31,15 +31,12 @@ namespace CoreModule.Terrain {
                 }
             }
         }
-        public Chunk(Point location) : this() {
-            Bounds = new Rect(location, ChunkSize, ChunkSize);
-        }
 
         public override void Update(float fElapsedTime) {
             base.Update(fElapsedTime);
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
             Pixel lines = new Pixel(255, 255, 255, 40);
 
@@ -72,7 +69,7 @@ namespace CoreModule.Terrain {
                     PixelEngine.Extensions.Transforms.Transform.DrawSprite(current.Sprite, transform);
                 }
 
-            if (Level.Instance.Editing) {
+            if (drawDebug) {
                 CoreGame.Instance.DrawRect(topLeft, bottomRight, lines);
                 foreach (Rect collider in Colliders) {
                     //CoreGame.Instance.DrawRect(collider.TopLeft + topLeft, collider.BottomRight + topLeft, lines);
@@ -147,28 +144,6 @@ namespace CoreModule.Terrain {
                     }
                 }
             }
-        }
-
-        public byte[] GetSaveData() {
-            byte[] tileData = new byte[NumTiles * NumTiles];
-            for (int x = 0; x < NumTiles; x++) {
-                for (int y = 0; y < NumTiles; y++) {
-                    tileData[y * (NumTiles) + x] = (byte)Tiles[x, y].Type;
-                }
-            }
-            return tileData;
-        }
-
-        public void LoadSaveData(byte[] data) {
-            for (int x = 0; x < NumTiles; x++) {
-                for (int y = 0; y < NumTiles; y++) {
-                    byte type = (byte)data[y * (NumTiles) + x];
-                    Tiles[x, y].Type = type;
-                    if (Tiles[x, y].Type != 0 || type != 1) Empty = false;
-                }
-            }
-
-            GenerateColliders();
         }
     }
 }

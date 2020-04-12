@@ -82,7 +82,7 @@ namespace CoreModule.Drawables {
             if (frame >= Frames.Length) frame = 0;
         }
 
-        public override void Draw() {
+        public override void Draw(bool drawDebug = false) {
             base.Draw();
 
             Transform transform = new Transform();
@@ -97,7 +97,9 @@ namespace CoreModule.Drawables {
 
             transform.Translate(X + Scenes.Level.Instance.CameraLocation.X, Y + Scenes.Level.Instance.CameraLocation.Y);
 
+            CoreGame.Instance.PixelMode = Pixel.Mode.Alpha;
             Transform.DrawSprite(Frame, transform);
+            CoreGame.Instance.PixelMode = Pixel.Mode.Normal;
         }
 
         public class Animation {
