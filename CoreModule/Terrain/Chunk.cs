@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using PixelEngine;
+using CoreModule.Saving;
 using CoreModule.Shapes;
 using CoreModule.Scenes;
 
@@ -9,12 +10,13 @@ using Point = CoreModule.Shapes.Point;
 
 namespace CoreModule.Terrain {
 
-    public class Chunk : Drawables.Drawable, Saving.ISerializable<Chunk> {
+    [Saveable]
+    public class Chunk : Drawables.Drawable {
         public const int NumTiles = 40;
         public const int ChunkSize = Tile.TileSize * NumTiles;
 
-        public Point WorldPosition { get; } = new Point();
-        public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
+        [At("root")] public Point WorldPosition { get; } = new Point();
+        [At("root")] public Tile[,] Tiles { get; } = new Tile[NumTiles, NumTiles];
         public List<Rect> Colliders { get; } = new List<Rect>();
         public bool Empty { get; private set; } = true;
 

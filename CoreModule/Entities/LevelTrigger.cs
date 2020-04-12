@@ -8,7 +8,7 @@ using CoreModule.Shapes;
 using CoreModule.Saving;
 
 namespace CoreModule.Entities {
-    public class LevelTrigger : Entity, ISerializable<LevelTrigger> {
+    public class LevelTrigger : Entity {
         public enum TriggerType : byte {
             Transition,
         }

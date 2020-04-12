@@ -104,7 +104,6 @@ namespace CoreModule.Scenes {
             TileManager.AddToManifest((byte)id.Value, name.Text, collide.On);
             TileManager.SaveManifest();
 
-            Level.Instance?.RefreshTextures();
             RefreshTileManager();
         }
 

@@ -87,6 +87,7 @@
     <Compile Include="Shapes\Rect.cs" />
     <Compile Include="Sound\SoundPlayer.cs" />
     <Compile Include="Terrain\Chunk.cs" />
+    <Compile Include="Terrain\ChunkSet.cs" />
     <Compile Include="Terrain\Tile.cs" />
     <Compile Include="Terrain\TileManager.cs" />
     <Compile Include="Entities\PhysicsEntity.cs" />

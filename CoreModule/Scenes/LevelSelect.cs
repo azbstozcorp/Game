@@ -35,7 +35,7 @@ namespace CoreModule.Scenes {
         }
 
         private void UpdateText(string newText) {
-            if (File.Exists($"Assets/Levels/{newText}.bin")) load.Text = "Load";
+            if (File.Exists($"Assets/Levels/{newText}.bin")) load.Text = "Load"; 
             else load.Text = "New ";
         }
         private void Load_Pressed(Button pressed) {

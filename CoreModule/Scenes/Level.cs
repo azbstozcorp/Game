@@ -26,7 +26,7 @@ namespace CoreModule.Scenes {
 
         public Player Player { get; private set; }
         public Point CameraLocation;
-        public Chunk[,] chunks;
+        public ChunkSet chunks;
 
         #region Editor Variables
         public bool Editing { get; private set; } = false;
@@ -48,14 +48,9 @@ namespace CoreModule.Scenes {
             Console.WriteLine($"Constructing new world with name {name}...");
             Name = name;
 
-            chunks = new Chunk[10, 10];
+            chunks = new ChunkSet();
 
-            for (int i = 0; i < 10; i++) for (int j = 0; j < 10; j++) {
-                    chunks[i, j] = new Chunk((i * Chunk.ChunkSize, j * Chunk.ChunkSize));
-                    chunks[i, j].WorldPosition.X = i;
-                    chunks[i, j].WorldPosition.Y = j;
-                }
-            //chunks[0, 0].SetTile(new Tile(byte.TT_DIRT), 2, 4);
+            SetTile(new Tile(2), 0, 0, 2, 4);
         }
         #endregion Constructors
 
@@ -64,7 +59,6 @@ namespace CoreModule.Scenes {
         /// Returns the chunk at a given index into the world, or null if the index is out of range.
         /// </summary>
         public Chunk GetChunk(int worldX, int worldY) {
-            if (worldX < 0 || worldY < 0 || worldX >= chunks.GetLength(0) || worldY >= chunks.GetLength(1)) return null;
             return chunks[worldX, worldY];
         }
         /// <summary>
@@ -78,23 +72,20 @@ namespace CoreModule.Scenes {
         /// <summary>
         /// Sets the tile in a chunk
         /// </summary>
-        public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) => GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
+        public void SetTile(Tile t, int worldX, int worldY, int tileX, int tileY) {
+            if (GetChunk(worldX, worldY) == null) {
+                chunks.SetChunk(new Chunk(), worldX, worldY);
+            } 
+            GetChunk(worldX, worldY).SetTile(t, tileX, tileY);
+        }
 
         public static Point ScreenToWorld(Point p) => p - Instance.CameraLocation;
         public static Point WorldToScreen(Point p) => p + Instance.CameraLocation;
         #endregion Chunk Utilities
 
-        public void RefreshTextures() {
-            for (int i = 0; i < chunks.GetLength(0); i++)
-                for (int j = 0; j < chunks.GetLength(1); j++) {
-                    GetChunk(i, j).GenerateColliders();
-                    for (int x = 0; x < Chunk.NumTiles; x++)
-                        for (int y = 0; y < Chunk.NumTiles; y++)
-                            GetChunk(i, j).GetTile(x, y).Type = GetChunk(i, j).GetTile(x, y).Type;
-                }
-        }
-
         void Exit() {
+            Save();
+            CoreGame.Instance.PopScene();
         }
 
         public override void Update(float fElapsedTime) {
@@ -112,9 +103,13 @@ namespace CoreModule.Scenes {
             CoreGame.Instance.Clear(Pixel.Presets.DarkBlue);
 
             Player.Draw();
-            for (int i = 0; i < chunks.GetLength(0); i++) for (int j = 0; j < chunks.GetLength(1); j++) {
-                    GetChunk(i, j).Draw();
+
+            for (int i = 0; i < chunks.Width; i++) {
+                for (int j = 0; j < chunks.Height; j++) {
+                    GetChunk(i, j)?.Draw();
                 }
+            }
+
             CurrentState.Draw();
             foreach (PhysicsEntity e in Entities) e.Draw();
             foreach (LevelTrigger t in LevelTriggers) t.Draw();
@@ -131,7 +126,7 @@ namespace CoreModule.Scenes {
             public override void Update(float fElapsedTime) {
                 base.Update(fElapsedTime);
 
-                Instance.Player.Update(fElapsedTime);
+                //Instance.Player.Update(fElapsedTime);
 
                 int cameraRatio = 1;
                 float newX = -Instance.Player.X +
@@ -148,11 +143,13 @@ namespace CoreModule.Scenes {
                 newX = CoreGame.Instance.Lerp(Instance.CameraLocation.X, newX, 0.1f);
                 newY = CoreGame.Instance.Lerp(Instance.CameraLocation.Y, newY, 0.1f);
 
-                Instance.CameraLocation.X = (int)newX; 
+                Instance.CameraLocation.X = (int)newX;
                 Instance.CameraLocation.Y = (int)newY;
 
                 foreach (PhysicsEntity e in Instance.Entities) e.Update(fElapsedTime);
                 foreach (LevelTrigger t in Instance.LevelTriggers) t.Update(fElapsedTime);
+
+                if (CoreGame.Instance.GetKey(Key.Escape).Pressed) Instance.Exit();
             }
 
             public override void Draw() {
@@ -167,5 +164,25 @@ namespace CoreModule.Scenes {
             }
         }
         #endregion States
+
+        #region    Saving / Loading
+
+        public void Save() {
+            string pathToLevel = $"Assets/Levels/{Name}";
+            string pathToChunks = $"{pathToLevel}/chunks";
+
+            chunks.SaveTo(pathToChunks);
+        }
+        public static Level LoadLevel(string name) {
+            string pathToLevel = $"Assets/Levels/{name}";
+            string pathToChunks = $"{pathToLevel}/chunks";
+
+            Level l = new Level(name);
+            l.chunks.LoadFrom(pathToChunks);
+
+            return l;
+        }
+
+        #endregion Saving / Loading
     }
 }
